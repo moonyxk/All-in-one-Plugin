@@ -1,0 +1,29 @@
+name: AllInOnePlugin
+main: xyz.niliees.allinoneplugin.AllInOnePlugin
+version: 1.0
+api-version: 1.19
+commands:
+  test:
+    description: Ein Testbefehl.
+    usage: /test
+  heal:
+    description: Heilt den Spieler vollständig.
+    usage: /heal
+  feed:
+    description: Füllt die Hungeranzeige des Spielers.
+    usage: /feed
+  fly:
+    description: Aktiviert oder deaktiviert das Fliegen für den Spieler.
+    usage: /fly
+  boom:
+    description: Erzeugt eine Explosion um den Spieler.
+    usage: /boom
+  balance:
+    description: Zeigt deinen aktuellen Kontostand an.
+    usage: /balance
+  pay:
+    description: Sende Coins an einen anderen Spieler.
+    usage: /pay <Spieler> <Betrag>
+  shop:
+    description: Kaufe ein Item mit Ingame-Währung.
+    usage: /shop <item> <price>
