@@ -6,7 +6,6 @@ import dev.moonyxk.allinoneplugin.commands.*;
 import dev.moonyxk.allinoneplugin.listeners.BlockBreakListener;
 import dev.moonyxk.allinoneplugin.listeners.PlayerChatListener;
 import dev.moonyxk.allinoneplugin.listeners.PlayerJoinListener;
-import dev.moonyxk.allinoneplugin.economy.EconomyManager;
 
 public class AllInOnePlugin extends JavaPlugin {
 
@@ -28,9 +27,6 @@ public class AllInOnePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerChatListener(), this);
-
-        // EconomyManager initialisieren
-        economyManager = new EconomyManager();
     }
 
     @Override
@@ -38,10 +34,4 @@ public class AllInOnePlugin extends JavaPlugin {
         // Plugin deaktivieren
         getLogger().info("AllInOnePlugin wird deaktiviert...");
     }
-        private EconomyManager economyManager;
-
-    public EconomyManager getEconomyManager() {
-        return economyManager;
-    }
-
 }
