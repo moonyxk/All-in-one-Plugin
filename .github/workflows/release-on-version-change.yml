@@ -1,0 +1,99 @@
+name: Release on version change
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - pom.xml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: version-release-${{ github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Detect Maven version change
+        id: version
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          read_version() {
+            python3 -c 'import sys, xml.etree.ElementTree as ET; root = ET.parse(sys.stdin).getroot(); print(root.findtext("{http://maven.apache.org/POM/4.0.0}version", ""))'
+          }
+
+          current_version=$(read_version < pom.xml)
+          previous_version=""
+          if git cat-file -e "$BEFORE_SHA:pom.xml" 2>/dev/null; then
+            previous_version=$(git show "$BEFORE_SHA:pom.xml" | read_version)
+          fi
+
+          if [[ "$current_version" == "$previous_version" ]]; then
+            echo "No Maven project version change; skipping release."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ ! "$current_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Maven version '$current_version' must use X.Y.Z format (optional prerelease suffix allowed)."
+            exit 1
+          fi
+
+          release_tag="v$current_version"
+          if existing_commit=$(git rev-parse --verify "refs/tags/${release_tag}^{commit}" 2>/dev/null); then
+            if [[ "$existing_commit" != "$GITHUB_SHA" ]]; then
+              echo "::error::Release tag '$release_tag' already points to another commit."
+              exit 1
+            fi
+          fi
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "version=$current_version" >> "$GITHUB_OUTPUT"
+          echo "tag=$release_tag" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v6
+        if: steps.version.outputs.changed == 'true'
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Build and test
+        if: steps.version.outputs.changed == 'true'
+        run: mvn --batch-mode --no-transfer-progress verify
+
+      - name: Create or update GitHub release
+        if: steps.version.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          asset="target/All-in-One-Plugin-${RELEASE_VERSION}.jar"
+          if [[ ! -f "$asset" ]]; then
+            echo "::error::Expected release artifact '$asset' was not built."
+            exit 1
+          fi
+
+          if gh release view "$RELEASE_TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
+            gh release upload --clobber --repo "$GH_REPO" "$RELEASE_TAG" "$asset"
+            exit
+          fi
+
+          options=(--generate-notes --target "$GITHUB_SHA")
+          if [[ "$RELEASE_VERSION" == *-* ]]; then
+            options+=(--prerelease)
+          fi
+          gh release create "$RELEASE_TAG" "$asset" \
+            --title "$RELEASE_TAG" "${options[@]}" --repo "$GH_REPO"
