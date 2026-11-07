@@ -6,14 +6,14 @@
 
   <groupId>dev.moonyxk</groupId>
   <artifactId>All-in-One-Plugin</artifactId>
-  <version>1.0</version>
+  <version>1.0.1</version>
   <packaging>jar</packaging>
 
   <name>All in One Plugin</name>
 
   <properties>
     <java.version>25</java.version>
-    <plugin.version>1.0</plugin.version>
+    <plugin.version>${project.version}</plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
