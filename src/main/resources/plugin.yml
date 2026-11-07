@@ -1,7 +1,8 @@
+# yaml-language-server: $schema=https://json.schemastore.org/bukkit-plugin.json
 name: AllInOnePlugin
 main: dev.moonyxk.allinoneplugin.AllInOnePlugin
 author: moonyxk
-version: 1.0
+version: '1.0'
 api-version: '26.3'
 commands:
   test:
