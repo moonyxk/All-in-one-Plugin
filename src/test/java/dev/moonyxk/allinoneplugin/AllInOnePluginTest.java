@@ -1,6 +1,7 @@
 package dev.moonyxk.allinoneplugin;
 
 import dev.moonyxk.allinoneplugin.features.Feature;
+import dev.moonyxk.allinoneplugin.features.PlayerMenu;
 import dev.moonyxk.allinoneplugin.features.SigmaMenu;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ class AllInOnePluginTest {
     @Test
     void enablesAndRegistersCommands() {
         assertTrue(plugin.isEnabled());
-        for (String name : new String[] {"heal", "feed", "fly", "kick", "boom", "sigma", "chestpunch"}) {
+        for (String name : new String[] {"heal", "feed", "fly", "kick", "boom", "sigma", "menu", "chestpunch"}) {
             assertNotNull(plugin.getCommand(name), "Command not registered: " + name);
         }
         for (String name : new String[] {"test", "balance", "pay", "shop"}) {
@@ -276,6 +277,56 @@ class AllInOnePluginTest {
         assertFalse(plugin.getConfig().getBoolean("features.chest-punch"));
         assertTrue(server.dispatchCommand(server.getConsoleSender(), "allinoneplugin:sigma chest-punch"));
         assertTrue(plugin.getConfig().getBoolean("features.chest-punch"));
+    }
+
+    @Test
+    void personalMenuChangesOnlyThePlayersChestPunchAndSoundSettings() {
+        PlayerMock first = server.addPlayer("First");
+        PlayerMock second = server.addPlayer("Second");
+
+        assertTrue(first.performCommand("allinoneplugin:menu"));
+        InventoryView firstView = first.getOpenInventory();
+        PlayerMenu firstMenu = assertInstanceOf(
+                PlayerMenu.class, firstView.getTopInventory().getHolder(false));
+        assertEquals(Material.CHEST,
+                firstView.getTopInventory().getItem(PlayerMenu.CHEST_PUNCH_SLOT).getType());
+        assertEquals(Material.NOTE_BLOCK,
+                firstView.getTopInventory().getItem(PlayerMenu.SOUND_SLOT).getType());
+
+        assertTrue(second.performCommand("allinoneplugin:menu"));
+        PlayerMenu secondMenu = assertInstanceOf(
+                PlayerMenu.class, second.getOpenInventory().getTopInventory().getHolder(false));
+        assertNotNull(firstMenu);
+        assertNotNull(secondMenu);
+        assertTrue(firstMenu.getInventory() != secondMenu.getInventory());
+
+        first.simulateInventoryClick(firstView, PlayerMenu.CHEST_PUNCH_SLOT);
+        assertEquals(Material.GRAY_DYE,
+                firstView.getTopInventory().getItem(PlayerMenu.CHEST_PUNCH_SLOT).getType());
+        assertEquals(Material.CHEST,
+                second.getOpenInventory().getTopInventory().getItem(PlayerMenu.CHEST_PUNCH_SLOT).getType());
+
+        first.simulateInventoryClick(firstView, PlayerMenu.SOUND_SLOT);
+        assertEquals(Material.GRAY_DYE,
+                firstView.getTopInventory().getItem(PlayerMenu.SOUND_SLOT).getType());
+        assertEquals(Material.NOTE_BLOCK,
+                second.getOpenInventory().getTopInventory().getItem(PlayerMenu.SOUND_SLOT).getType());
+        assertTrue(plugin.getConfig().getBoolean("features.chest-punch"));
+
+        WorldMock world = server.addSimpleWorld("personal-chest-test");
+        Block chest = world.getBlockAt(0, 70, 0);
+        chest.setType(Material.CHEST);
+        first.getInventory().setItemInMainHand(new ItemStack(Material.DIRT));
+        second.getInventory().setItemInMainHand(new ItemStack(Material.STONE));
+        punch(first, chest);
+        assertEquals(Material.DIRT, first.getInventory().getItemInMainHand().getType());
+        punch(second, chest);
+        assertTrue(second.getInventory().getItemInMainHand().isEmpty());
+
+        first.simulateInventoryClick(firstView, PlayerMenu.CHEST_PUNCH_SLOT);
+        first.getInventory().setItemInMainHand(new ItemStack(Material.DIRT));
+        punch(first, chest);
+        assertTrue(first.getInventory().getItemInMainHand().isEmpty());
     }
 
     @Test

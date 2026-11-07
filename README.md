@@ -11,8 +11,9 @@ Ein Plugin für **Paper 26.3**. Entwickelt für **Java 25**.
 | `/fly <Spieler>` | Schaltet das Fliegen für den Spieler ein oder aus. |
 | `/boom <Spieler> [true/false]` | Erzeugt beim Spieler eine Explosion, die keine Blöcke zerstört. Der optionale Wert schaltet den Schaden an Entities ein oder aus (Standard: `true`). |
 | `/kick <Spieler> <Grund>` | Entfernt einen Spieler mit Begründung vom Server. |
+| `/menu` | Öffnet dein persönliches Menü für ChestPunch und den ChestPunch-Sound. |
 
-Alle Befehle benötigen die Berechtigung `allinoneplugin.mod`, die standardmäßig Operatoren vorbehalten ist. Der Spielername ist verpflichtend; die Befehle können auch über die Serverkonsole ausgeführt werden.
+Die Moderator-Befehle benötigen die Berechtigung `allinoneplugin.mod`, die standardmäßig Operatoren vorbehalten ist. `/menu` ist für alle Spieler verfügbar. Bei den Moderator-Befehlen ist der Spielername verpflichtend; sie können auch über die Serverkonsole ausgeführt werden.
 
 ## Umschaltbare Funktionen (`/sigma`)
 
@@ -20,7 +21,7 @@ Alle Befehle benötigen die Berechtigung `allinoneplugin.mod`, die standardmäß
 
 | Funktion | ID | Beschreibung |
 | --- | --- | --- |
-| ChestPunch | `chest-punch` | Ein Linksklick mit einem Gegenstand auf eine Truhe, Falltruhe oder ein Fass (nicht mit einer Axt) bzw. auf einen Spender, Werfer oder Trichter (nicht mit einer Spitzhacke) legt den Stapel hinein. Nicht beim Schleichen. Jeder Spieler kann es mit `/chestpunch` für sich selbst ausschalten (Berechtigung `allinoneplugin.chestpunch`, standardmäßig für alle). |
+| ChestPunch | `chest-punch` | Ein Linksklick mit einem Gegenstand auf eine Truhe, Falltruhe oder ein Fass (nicht mit einer Axt) bzw. auf einen Spender, Werfer oder Trichter (nicht mit einer Spitzhacke) legt den Stapel hinein. Nicht beim Schleichen. Jeder Spieler kann ChestPunch und den Sound im persönlichen `/menu` unabhängig für sich ein- oder ausschalten. Alternativ schaltet `/chestpunch` ChestPunch für den Spieler um (Berechtigung `allinoneplugin.chestpunch`, standardmäßig für alle). |
 | NoCreeperGrief | `no-creeper-grief` | Creeper-Explosionen zerstören keine Blöcke; ob sie Spielern und Entities Schaden zufügen, lässt sich per Rechtsklick im Menü umschalten. |
 
 Zusätzliche Funktionen:

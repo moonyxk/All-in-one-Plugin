@@ -37,10 +37,12 @@ public class ChestPunchListener implements Listener {
 
     private final FeatureManager features;
     private final NamespacedKey enabledKey;
+    private final NamespacedKey soundEnabledKey;
 
     public ChestPunchListener(Plugin plugin, FeatureManager features) {
         this.features = features;
         this.enabledKey = new NamespacedKey(plugin, "chestpunch-enabled");
+        this.soundEnabledKey = new NamespacedKey(plugin, "chestpunch-sound-enabled");
     }
 
     public boolean isEnabledFor(Player player) {
@@ -50,6 +52,17 @@ public class ChestPunchListener implements Listener {
     public boolean toggleFor(Player player) {
         boolean enabled = !isEnabledFor(player);
         player.getPersistentDataContainer().set(enabledKey, PersistentDataType.BOOLEAN, enabled);
+        return enabled;
+    }
+
+    public boolean isSoundEnabledFor(Player player) {
+        return player.getPersistentDataContainer().getOrDefault(
+                soundEnabledKey, PersistentDataType.BOOLEAN, true);
+    }
+
+    public boolean toggleSoundFor(Player player) {
+        boolean enabled = !isSoundEnabledFor(player);
+        player.getPersistentDataContainer().set(soundEnabledKey, PersistentDataType.BOOLEAN, enabled);
         return enabled;
     }
 
@@ -80,7 +93,9 @@ public class ChestPunchListener implements Listener {
 
         destination.addItem(item);
         player.getInventory().setItemInMainHand(null);
-        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1f, 1f);
+        if (isSoundEnabledFor(player)) {
+            player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1f, 1f);
+        }
         event.setCancelled(true);
     }
 }
