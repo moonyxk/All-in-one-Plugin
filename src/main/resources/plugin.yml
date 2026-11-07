@@ -2,7 +2,7 @@
 name: AllInOnePlugin
 main: dev.moonyxk.allinoneplugin.AllInOnePlugin
 author: moonyxk
-version: '1.0'
+version: '${plugin.version}'
 api-version: '26.3'
 commands:
   test:

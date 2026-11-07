@@ -51,6 +51,16 @@ Kopiere die JAR-Datei in den `plugins`-Ordner deines Paper-Servers und starte de
 
 Dieses Projekt verwendet **Maven**, nicht Gradle. Ein Gradle-Wrapper (`gradlew`) ist nicht vorhanden. Zum Bauen verwendest du `mvn clean package`.
 
+## GitHub Actions
+
+- Bei Pushes und Pull Requests baut und testet GitHub Actions das Plugin. Das JAR steht anschließend als Workflow-Artefakt zum Download bereit.
+- Für jedes veröffentlichte Release, auch manuell erstellte Releases und Vorabversionen, wird das Plugin gebaut, getestet und als JAR angehängt. Entwürfe werden spätestens bei ihrer Veröffentlichung berücksichtigt.
+- Ein Versions-Tag wie `v1.3.0` erstellt ein GitHub-Release mit dem passenden JAR und generierten Release-Notizen. Tags mit einem Zusatz wie `v1.3.0-rc.1` werden als Vorabversion veröffentlicht.
+
+Für lokale Builds steht die Plugin-Version als `plugin.version` in der `pom.xml`. Bei Releases wird sie automatisch aus dem Tag übernommen; Zeichen außerhalb von Buchstaben, Ziffern, Punkt, Unterstrich und Bindestrich werden durch Bindestriche ersetzt.
+
+Ein vorhandenes Release-JAR mit demselben Namen wird ersetzt. GitHub startet keinen Release-Workflow für Releases, die ein anderer Workflow mit `GITHUB_TOKEN` erstellt; dieser muss das JAR selbst anhängen. Bei unveränderlichen Releases müssen Assets bereits vor der Veröffentlichung angehängt werden.
+
 ## Einschränkungen
 
 - Coins werden nur im Arbeitsspeicher gespeichert und gehen beim Neustart des Servers verloren.

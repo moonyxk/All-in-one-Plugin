@@ -13,6 +13,7 @@
 
   <properties>
     <java.version>25</java.version>
+    <plugin.version>1.0</plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 

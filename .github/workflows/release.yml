@@ -1,0 +1,152 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  release:
+    types: [published]
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      commit: ${{ steps.version.outputs.commit }}
+      already_built: ${{ steps.existing.outputs.already_built }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Determine release version
+        id: version
+        run: |
+          version="$GITHUB_REF_NAME"
+          if [[ "$version" =~ ^v[0-9] ]]; then
+            version="${version#v}"
+          fi
+          version="${version//[^a-zA-Z0-9._-]/-}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Check for an existing build
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+          RELEASE_COMMIT: ${{ steps.version.outputs.commit }}
+        run: |
+          release_id=$(gh api graphql \
+            -f 'query=query($owner:String!,$name:String!,$tag:String!){repository(owner:$owner,name:$name){release(tagName:$tag){databaseId}}}' \
+            -f "owner=${GH_REPO%/*}" -f "name=${GH_REPO#*/}" -f "tag=$GITHUB_REF_NAME" \
+            --jq 'if .data.repository == null then error("Repository not accessible") elif .data.repository.release == null then empty elif .data.repository.release.databaseId == null then error("Release ID unavailable") else .data.repository.release.databaseId end')
+          export ASSET_NAME="All-in-One-Plugin-${RELEASE_VERSION}.jar"
+          label="$ASSET_NAME (commit $RELEASE_COMMIT)"
+          already_built=false
+          if [[ -n "$release_id" ]]; then
+            asset=$(gh api --paginate "repos/${GH_REPO}/releases/${release_id}/assets?per_page=100" \
+              --jq '.[] | select(.name == env.ASSET_NAME) | [.label, .uploader.login] | @tsv')
+            if [[ "$asset" == "$label"$'\t'github-actions\[bot\] ]]; then
+              echo "The release already contains the plugin built from this commit."
+              already_built=true
+            fi
+          fi
+          echo "already_built=$already_built" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-java@v6
+        if: steps.existing.outputs.already_built != 'true'
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Set Maven release version
+        if: steps.existing.outputs.already_built != 'true'
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: >-
+          mvn --batch-mode --no-transfer-progress
+          org.codehaus.mojo:versions-maven-plugin:2.24.0:set
+          "-DnewVersion=$RELEASE_VERSION" -DgenerateBackupPoms=false
+
+      - name: Build and test
+        if: steps.existing.outputs.already_built != 'true'
+        env:
+          RELEASE_VERSION: ${{ steps.version.outputs.version }}
+        run: mvn --batch-mode --no-transfer-progress "-Dplugin.version=$RELEASE_VERSION" verify
+
+      - name: Upload release JAR
+        if: steps.existing.outputs.already_built != 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-jar
+          path: target/All-in-One-Plugin-${{ steps.version.outputs.version }}.jar
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    if: needs.build.outputs.already_built != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-jar
+          path: release
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_VERSION: ${{ needs.build.outputs.version }}
+          RELEASE_COMMIT: ${{ needs.build.outputs.commit }}
+        run: |
+          asset_name="All-in-One-Plugin-${RELEASE_VERSION}.jar"
+          asset="release/$asset_name#$asset_name (commit $RELEASE_COMMIT)"
+
+          if [[ "$GITHUB_EVENT_NAME" == "release" ]]; then
+            gh release upload --clobber -- "$GITHUB_REF_NAME" "$asset"
+            exit
+          fi
+
+          get_release_state() {
+            gh api graphql \
+              -f 'query=query($owner:String!,$name:String!,$tag:String!){repository(owner:$owner,name:$name){release(tagName:$tag){isDraft}}}' \
+              -f "owner=${GH_REPO%/*}" -f "name=${GH_REPO#*/}" -f "tag=$GITHUB_REF_NAME" \
+              --jq 'if .data.repository == null then error("Repository not accessible") elif .data.repository.release == null then "missing" elif .data.repository.release.isDraft then "draft" else "published" end'
+          }
+
+          state=$(get_release_state)
+          case "$state" in
+            draft|published)
+              gh release upload --clobber -- "$GITHUB_REF_NAME" "$asset"
+              ;;
+            missing)
+              options=(--verify-tag --generate-notes)
+              if [[ "$RELEASE_VERSION" == *-* ]]; then
+                options+=(--prerelease)
+              fi
+              if ! gh release create "${options[@]}" -- "$GITHUB_REF_NAME" "$asset"; then
+                state=$(get_release_state)
+                if [[ "$state" != "published" ]]; then
+                  echo "::error::Release creation failed; current state: $state"
+                  exit 1
+                fi
+                gh release upload --clobber -- "$GITHUB_REF_NAME" "$asset"
+              fi
+              ;;
+            *)
+              echo "::error::Unexpected release state: $state"
+              exit 1
+              ;;
+          esac
