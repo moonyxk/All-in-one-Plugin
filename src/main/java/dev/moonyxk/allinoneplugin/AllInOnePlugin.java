@@ -1,15 +1,15 @@
-package xyz.niliees.allinoneplugin;
+package dev.moonyxk.allinoneplugin;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
-import xyz.niliees.allinoneplugin.commands.*;
-import xyz.niliees.allinoneplugin.listeners.BlockBreakListener;
-import xyz.niliees.allinoneplugin.listeners.PlayerChatListener;
-import xyz.niliees.allinoneplugin.listeners.PlayerJoinListener;
-import xyz.niliees.allinoneplugin.economy.EconomyManager;
+import dev.moonyxk.allinoneplugin.commands.*;
+import dev.moonyxk.allinoneplugin.listeners.BlockBreakListener;
+import dev.moonyxk.allinoneplugin.listeners.PlayerChatListener;
+import dev.moonyxk.allinoneplugin.listeners.PlayerJoinListener;
+import dev.moonyxk.allinoneplugin.economy.EconomyManager;
 
-public final class AllInOnePlugin extends JavaPlugin {
+public class AllInOnePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {

@@ -1,7 +1,8 @@
 name: AllInOnePlugin
-main: xyz.niliees.allinoneplugin.AllInOnePlugin
+main: dev.moonyxk.allinoneplugin.AllInOnePlugin
+author: moonyxk
 version: 1.0
-api-version: 1.19
+api-version: '26.3'
 commands:
   test:
     description: Ein Testbefehl.
@@ -15,6 +16,10 @@ commands:
   fly:
     description: Aktiviert oder deaktiviert das Fliegen für den Spieler.
     usage: /fly
+  kick:
+    description: Entfernt einen Spieler mit Begründung vom Server.
+    usage: /kick <Spieler> <Grund>
+    permission: allinoneplugin.kick
   boom:
     description: Erzeugt eine Explosion um den Spieler.
     usage: /boom
@@ -27,3 +32,7 @@ commands:
   shop:
     description: Kaufe ein Item mit Ingame-Währung.
     usage: /shop <item> <price>
+permissions:
+  allinoneplugin.kick:
+    description: Erlaubt das Kicken von Spielern.
+    default: op
