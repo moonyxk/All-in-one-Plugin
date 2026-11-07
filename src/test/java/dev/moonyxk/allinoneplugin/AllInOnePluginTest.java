@@ -243,6 +243,7 @@ class AllInOnePluginTest {
         PlayerMock admin = server.addPlayer("Admin");
         admin.setOp(true);
         assertTrue(plugin.getConfig().getBoolean("features.no-creeper-grief"));
+        assertFalse(plugin.getConfig().getBoolean("features.first-join-recipes"));
         assertNull(plugin.getCommand("sigma").getPermission());
         assertEquals(PermissionDefault.OP, server.getPluginManager().getPermission(SigmaCommand.PERMISSION).getDefault());
 
@@ -275,11 +276,11 @@ class AllInOnePluginTest {
         assertTrue(plugin.getConfig().getBoolean("features.no-creeper-grief"));
 
         admin.simulateInventoryClick(view, Feature.FIRST_JOIN_RECIPES.ordinal());
-        assertFalse(plugin.getConfig().getBoolean("features.first-join-recipes"));
-        assertTrue(admin.performCommand("allinoneplugin:sigma first-join-recipes on"));
-        assertFalse(plugin.getConfig().getBoolean("features.first-join-recipes"));
-        admin.simulateInventoryClick(view, Feature.FIRST_JOIN_RECIPES.ordinal());
         assertTrue(plugin.getConfig().getBoolean("features.first-join-recipes"));
+        assertTrue(admin.performCommand("allinoneplugin:sigma first-join-recipes on"));
+        assertTrue(plugin.getConfig().getBoolean("features.first-join-recipes"));
+        admin.simulateInventoryClick(view, Feature.FIRST_JOIN_RECIPES.ordinal());
+        assertFalse(plugin.getConfig().getBoolean("features.first-join-recipes"));
 
         PlayerMock player = server.addPlayer("Player");
         assertTrue(player.performCommand("allinoneplugin:sigma"));

@@ -11,7 +11,7 @@ public class FeatureManager {
     }
 
     public boolean isEnabled(Feature feature) {
-        return plugin.getConfig().getBoolean(path(feature), true);
+        return plugin.getConfig().getBoolean(path(feature), feature.defaultEnabled());
     }
 
     public void setEnabled(Feature feature, boolean enabled) {

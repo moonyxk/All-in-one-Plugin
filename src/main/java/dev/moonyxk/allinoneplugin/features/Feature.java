@@ -9,24 +9,31 @@ public enum Feature {
     NO_CREEPER_GRIEF("no-creeper-grief", "NoCreeperGrief", Material.CREEPER_HEAD,
             "Creeper-Explosionen zerstören keine Blöcke; Schaden ist separat einstellbar."),
     FIRST_JOIN_RECIPES("first-join-recipes", "Alle Rezepte beim ersten Beitritt", Material.KNOWLEDGE_BOOK,
-            "Gibt neuen Spielern beim ersten Beitritt alle Rezepte.", false);
+            "Gibt neuen Spielern beim ersten Beitritt alle Rezepte.", false, false);
 
     private final String id;
     private final String displayName;
     private final Material icon;
     private final String description;
     private final boolean commandToggleable;
+    private final boolean defaultEnabled;
 
     Feature(String id, String displayName, Material icon, String description) {
-        this(id, displayName, icon, description, true);
+        this(id, displayName, icon, description, true, true);
     }
 
     Feature(String id, String displayName, Material icon, String description, boolean commandToggleable) {
+        this(id, displayName, icon, description, commandToggleable, true);
+    }
+
+    Feature(String id, String displayName, Material icon, String description,
+            boolean commandToggleable, boolean defaultEnabled) {
         this.id = id;
         this.displayName = displayName;
         this.icon = icon;
         this.description = description;
         this.commandToggleable = commandToggleable;
+        this.defaultEnabled = defaultEnabled;
     }
 
     public String id() {
@@ -47,6 +54,10 @@ public enum Feature {
 
     public boolean commandToggleable() {
         return commandToggleable;
+    }
+
+    public boolean defaultEnabled() {
+        return defaultEnabled;
     }
 
     public static Feature byId(String id) {
