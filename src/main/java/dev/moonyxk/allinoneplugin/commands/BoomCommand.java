@@ -11,13 +11,27 @@ public class BoomCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player target = CommandTarget.findPlayer(sender, label, args);
+        if (args.length != 1) {
+            return false;
+        }
+
+        Player target = CommandTarget.findPlayer(sender, args[0]);
         if (target == null) {
             return true;
         }
 
         Location loc = target.getLocation();
-        World world = target.getWorld();
+        if (loc == null) {
+            sender.sendMessage("§cDer Standort von " + target.getName() + " konnte nicht ermittelt werden.");
+            return true;
+        }
+
+        World world = loc.getWorld();
+        if (world == null) {
+            sender.sendMessage("§cDer Standort von " + target.getName() + " konnte nicht ermittelt werden.");
+            return true;
+        }
+
         if (!world.createExplosion(loc.getX(), loc.getY(), loc.getZ(), 3.0f, false, false)) {
             sender.sendMessage("§cDie Explosion bei " + target.getName() + " konnte nicht ausgelöst werden.");
             return true;

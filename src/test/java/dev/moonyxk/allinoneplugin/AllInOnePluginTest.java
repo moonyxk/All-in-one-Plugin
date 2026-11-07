@@ -125,16 +125,19 @@ class AllInOnePluginTest {
         target.setFoodLevel(5);
         clearMessages(moderator);
 
+        assertFalse(moderator.performCommand("allinoneplugin:kick Target"));
+        assertEquals(Component.text("/kick <Spieler> <Grund>"), moderator.nextComponentMessage());
+
         for (String name : new String[] {"heal", "feed", "fly", "boom"}) {
-            assertTrue(moderator.performCommand("allinoneplugin:" + name));
-            assertEquals(Component.text("Verwendung: /allinoneplugin:" + name + " <Spieler>", NamedTextColor.RED),
+            assertFalse(moderator.performCommand("allinoneplugin:" + name));
+            assertEquals(Component.text("/" + name + " <Spieler>"),
                     moderator.nextComponentMessage());
             assertTrue(moderator.performCommand("allinoneplugin:" + name + " Offline"));
             assertEquals(Component.text("Spieler nicht gefunden.", NamedTextColor.RED), moderator.nextComponentMessage());
         }
 
-        assertTrue(moderator.performCommand("allinoneplugin:heal Target Extra"));
-        assertEquals(Component.text("Verwendung: /allinoneplugin:heal <Spieler>", NamedTextColor.RED),
+        assertFalse(moderator.performCommand("allinoneplugin:heal Target Extra"));
+        assertEquals(Component.text("/heal <Spieler>"),
                 moderator.nextComponentMessage());
         assertEquals(10, target.getHealth());
         assertEquals(5, target.getFoodLevel());

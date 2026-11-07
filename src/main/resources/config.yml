@@ -1,4 +1,4 @@
 # Standardkonfiguration für AllInOnePlugin
 
 # Join-Nachricht. %player% wird durch den Spielernamen ersetzt.
-join-message: "&aWillkommen, %player%! Viel Spaß auf dem Server!"
+join-message: "&aWillkommen, %player%!"

@@ -9,13 +9,8 @@ final class CommandTarget {
     private CommandTarget() {
     }
 
-    static Player findPlayer(CommandSender sender, String label, String[] args) {
-        if (args.length != 1) {
-            sender.sendMessage("§cVerwendung: /" + label + " <Spieler>");
-            return null;
-        }
-
-        Player target = Bukkit.getPlayer(args[0]);
+    static Player findPlayer(CommandSender sender, String name) {
+        Player target = Bukkit.getPlayer(name);
         if (target == null) {
             sender.sendMessage("§cSpieler nicht gefunden.");
         }

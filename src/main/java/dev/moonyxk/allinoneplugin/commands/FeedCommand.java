@@ -9,7 +9,11 @@ public class FeedCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        Player target = CommandTarget.findPlayer(sender, label, args);
+        if (args.length != 1) {
+            return false;
+        }
+
+        Player target = CommandTarget.findPlayer(sender, args[0]);
         if (target == null) {
             return true;
         }

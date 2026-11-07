@@ -1,11 +1,13 @@
 package dev.moonyxk.allinoneplugin.listeners;
 
+import dev.moonyxk.allinoneplugin.AllInOnePlugin;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import dev.moonyxk.allinoneplugin.AllInOnePlugin;
 
 public class PlayerJoinListener implements Listener {
 
@@ -26,6 +28,6 @@ public class PlayerJoinListener implements Listener {
         }
 
         // Nachricht für alle Spieler (Broadcast)
-        Bukkit.broadcastMessage("§6" + player.getName() + " hat den Server betreten!");
+        Bukkit.broadcast(Component.text(player.getName() + " hat den Server betreten!", NamedTextColor.GOLD));
     }
 }
