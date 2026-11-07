@@ -16,12 +16,12 @@ Alle Befehle benötigen die Berechtigung `allinoneplugin.mod`, die standardmäß
 
 ## Umschaltbare Funktionen (`/sigma`)
 
-`/sigma` öffnet ein Menü, in dem Funktionen per Klick aktiviert oder deaktiviert werden. Über die Konsole oder direkt per Befehl geht das mit `/sigma <Funktion> [on|off]` (ohne `on`/`off` wird umgeschaltet). Der Befehl benötigt `allinoneplugin.sigma` (standardmäßig nur Operatoren). Die Zustände werden unter `features` in der `config.yml` gespeichert.
+`/sigma` öffnet ein Menü, in dem Funktionen per Linksklick aktiviert oder deaktiviert werden. Bei `NoCreeperGrief` schaltet ein Rechtsklick zusätzlich den Creeper-Schaden um. Über die Konsole oder direkt per Befehl geht das mit `/sigma <Funktion> [on|off]` (ohne `on`/`off` wird umgeschaltet). Der Befehl benötigt `allinoneplugin.sigma` (standardmäßig nur Operatoren). Die Zustände werden unter `features` in der `config.yml` gespeichert.
 
 | Funktion | ID | Beschreibung |
 | --- | --- | --- |
 | ChestPunch | `chest-punch` | Ein Linksklick mit einem Gegenstand auf eine Truhe, Falltruhe oder ein Fass (nicht mit einer Axt) bzw. auf einen Spender, Werfer oder Trichter (nicht mit einer Spitzhacke) legt den Stapel hinein. Nicht beim Schleichen. Jeder Spieler kann es mit `/chestpunch` für sich selbst ausschalten (Berechtigung `allinoneplugin.chestpunch`, standardmäßig für alle). |
-| NoCreeperGrief | `no-creeper-grief` | Creeper-Explosionen zerstören keine Blöcke. |
+| NoCreeperGrief | `no-creeper-grief` | Creeper-Explosionen zerstören keine Blöcke; ob sie Spielern und Entities Schaden zufügen, lässt sich per Rechtsklick im Menü umschalten. |
 
 Zusätzliche Funktionen:
 

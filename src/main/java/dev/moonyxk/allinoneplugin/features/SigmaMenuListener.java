@@ -1,6 +1,8 @@
 package dev.moonyxk.allinoneplugin.features;
 
 import dev.moonyxk.allinoneplugin.commands.SigmaCommand;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,6 +34,16 @@ public class SigmaMenuListener implements Listener {
         }
         if (!player.hasPermission(SigmaCommand.PERMISSION)) {
             player.closeInventory();
+            return;
+        }
+
+        if (feature == Feature.NO_CREEPER_GRIEF && event.isRightClick()) {
+            boolean damageEnabled = features.toggleCreeperDamage();
+            menu.render();
+            player.sendMessage(Component.text("Creeper-Schaden ist jetzt ", NamedTextColor.GRAY)
+                    .append(Component.text(damageEnabled ? "aktiviert" : "deaktiviert",
+                            damageEnabled ? NamedTextColor.GREEN : NamedTextColor.RED))
+                    .append(Component.text(".", NamedTextColor.GRAY)));
             return;
         }
 

@@ -1,5 +1,6 @@
 package dev.moonyxk.allinoneplugin.features;
 
+import java.util.ArrayList;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -31,21 +32,30 @@ public final class SigmaMenu implements InventoryHolder {
 
     public void render() {
         for (Feature feature : Feature.values()) {
-            inventory.setItem(feature.ordinal(), createIcon(feature, features.isEnabled(feature)));
+            inventory.setItem(feature.ordinal(), createIcon(feature, features));
         }
     }
 
-    private static ItemStack createIcon(Feature feature, boolean enabled) {
+    private static ItemStack createIcon(Feature feature, FeatureManager features) {
+        boolean enabled = features.isEnabled(feature);
         NamedTextColor stateColor = enabled ? NamedTextColor.GREEN : NamedTextColor.RED;
         ItemStack item = new ItemStack(feature.icon());
         ItemMeta meta = item.getItemMeta();
         meta.displayName(plain(feature.displayName(), stateColor).decorate(TextDecoration.BOLD));
-        meta.lore(List.of(
+        List<Component> lore = new ArrayList<>(List.of(
                 plain(feature.description(), NamedTextColor.GRAY),
                 Component.empty(),
                 plain("Status: ", NamedTextColor.GRAY)
                         .append(plain(enabled ? "Aktiviert" : "Deaktiviert", stateColor)),
-                plain("Klicken zum Umschalten", NamedTextColor.YELLOW)));
+                plain("Linksklick zum Umschalten", NamedTextColor.YELLOW)));
+        if (feature == Feature.NO_CREEPER_GRIEF) {
+            boolean damage = features.isCreeperDamageEnabled();
+            lore.add(plain("Creeper-Schaden: ", NamedTextColor.GRAY)
+                    .append(plain(damage ? "An" : "Aus",
+                            damage ? NamedTextColor.GREEN : NamedTextColor.RED)));
+            lore.add(plain("Rechtsklick: Schaden umschalten", NamedTextColor.YELLOW));
+        }
+        meta.lore(lore);
         meta.setEnchantmentGlintOverride(enabled);
         item.setItemMeta(meta);
         return item;

@@ -7,7 +7,7 @@ public enum Feature {
     CHEST_PUNCH("chest-punch", "ChestPunch", Material.CHEST,
             "Gegenstände per Linksklick in Truhen, Fässer, Spender, Werfer und Trichter legen."),
     NO_CREEPER_GRIEF("no-creeper-grief", "NoCreeperGrief", Material.CREEPER_HEAD,
-            "Creeper-Explosionen zerstören keine Blöcke.");
+            "Creeper-Explosionen zerstören keine Blöcke; Schaden ist separat einstellbar.");
 
     private final String id;
     private final String displayName;

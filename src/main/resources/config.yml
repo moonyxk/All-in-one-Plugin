@@ -7,3 +7,4 @@ join-message: "&aWillkommen, %player%!"
 features:
   chest-punch: true
   no-creeper-grief: true
+  no-creeper-grief-damage: true

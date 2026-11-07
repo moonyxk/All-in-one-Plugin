@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.ExplosionResult;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -16,8 +17,12 @@ import org.bukkit.block.Container;
 import org.bukkit.entity.Creeper;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryView;
@@ -242,6 +247,19 @@ class AllInOnePluginTest {
         assertInstanceOf(SigmaMenu.class, view.getTopInventory().getHolder(false));
         assertEquals(Material.CREEPER_HEAD, view.getTopInventory().getItem(Feature.NO_CREEPER_GRIEF.ordinal()).getType());
 
+        InventoryClickEvent rightClick = new InventoryClickEvent(
+                view, InventoryType.SlotType.CONTAINER, Feature.NO_CREEPER_GRIEF.ordinal(),
+                ClickType.RIGHT, InventoryAction.PICKUP_ALL);
+        server.getPluginManager().callEvent(rightClick);
+        assertTrue(rightClick.isCancelled());
+        assertFalse(plugin.getConfig().getBoolean("features.no-creeper-grief-damage"));
+
+        rightClick = new InventoryClickEvent(
+                view, InventoryType.SlotType.CONTAINER, Feature.NO_CREEPER_GRIEF.ordinal(),
+                ClickType.RIGHT, InventoryAction.PICKUP_ALL);
+        server.getPluginManager().callEvent(rightClick);
+        assertTrue(plugin.getConfig().getBoolean("features.no-creeper-grief-damage"));
+
         InventoryClickEvent click = admin.simulateInventoryClick(view, Feature.NO_CREEPER_GRIEF.ordinal());
         assertTrue(click.isCancelled());
         assertFalse(plugin.getConfig().getBoolean("features.no-creeper-grief"));
@@ -267,12 +285,32 @@ class AllInOnePluginTest {
 
         ExplosionPrimeEvent event = new ExplosionPrimeEvent(creeper, 3.0F, false);
         server.getPluginManager().callEvent(event);
+        assertEquals(3.0F, event.getRadius());
+
+        Block affectedBlock = world.getBlockAt(1, 70, 0);
+        EntityExplodeEvent explodeEvent = new EntityExplodeEvent(
+                creeper, creeper.getLocation(), new ArrayList<>(List.of(affectedBlock)),
+                1.0F, ExplosionResult.DESTROY);
+        server.getPluginManager().callEvent(explodeEvent);
+        assertTrue(explodeEvent.blockList().isEmpty());
+        assertEquals(0.0F, explodeEvent.getYield());
+
+        plugin.getConfig().set("features.no-creeper-grief-damage", false);
+        event = new ExplosionPrimeEvent(creeper, 3.0F, false);
+        server.getPluginManager().callEvent(event);
         assertEquals(-3.0F, event.getRadius());
 
+        plugin.getConfig().set("features.no-creeper-grief-damage", true);
         assertTrue(server.dispatchCommand(server.getConsoleSender(), "allinoneplugin:sigma no-creeper-grief off"));
         event = new ExplosionPrimeEvent(creeper, 3.0F, false);
         server.getPluginManager().callEvent(event);
         assertEquals(3.0F, event.getRadius());
+
+        explodeEvent = new EntityExplodeEvent(
+                creeper, creeper.getLocation(), new ArrayList<>(List.of(affectedBlock)),
+                1.0F, ExplosionResult.DESTROY);
+        server.getPluginManager().callEvent(explodeEvent);
+        assertEquals(1, explodeEvent.blockList().size());
     }
 
     @Test

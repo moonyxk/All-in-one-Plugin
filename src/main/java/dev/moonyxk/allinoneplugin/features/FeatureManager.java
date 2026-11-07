@@ -25,6 +25,17 @@ public class FeatureManager {
         return enabled;
     }
 
+    public boolean isCreeperDamageEnabled() {
+        return plugin.getConfig().getBoolean("features.no-creeper-grief-damage", true);
+    }
+
+    public boolean toggleCreeperDamage() {
+        boolean enabled = !isCreeperDamageEnabled();
+        plugin.getConfig().set("features.no-creeper-grief-damage", enabled);
+        plugin.saveConfig();
+        return enabled;
+    }
+
     private static String path(Feature feature) {
         return "features." + feature.id();
     }
