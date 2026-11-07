@@ -28,7 +28,6 @@ commands:
   sigma:
     description: Öffnet das Menü zum Aktivieren und Deaktivieren von Funktionen.
     usage: /sigma [Funktion] [on|off]
-    permission: allinoneplugin.sigma
   menu:
     description: Öffnet dein persönliches Einstellungsmenü.
     usage: /menu

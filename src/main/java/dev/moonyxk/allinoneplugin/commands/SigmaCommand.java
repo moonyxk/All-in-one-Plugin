@@ -2,7 +2,9 @@ package dev.moonyxk.allinoneplugin.commands;
 
 import dev.moonyxk.allinoneplugin.features.Feature;
 import dev.moonyxk.allinoneplugin.features.FeatureManager;
+import dev.moonyxk.allinoneplugin.features.PlayerMenu;
 import dev.moonyxk.allinoneplugin.features.SigmaMenu;
+import dev.moonyxk.allinoneplugin.listeners.ChestPunchListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -18,13 +20,26 @@ public class SigmaCommand implements TabExecutor {
     public static final String PERMISSION = "allinoneplugin.sigma";
 
     private final FeatureManager features;
+    private final ChestPunchListener chestPunch;
 
-    public SigmaCommand(FeatureManager features) {
+    public SigmaCommand(FeatureManager features, ChestPunchListener chestPunch) {
         this.features = features;
+        this.chestPunch = chestPunch;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender instanceof Player player && !player.hasPermission(PERMISSION)) {
+            if (args.length == 0) {
+                player.openInventory(new PlayerMenu(player.getUniqueId(),
+                        chestPunch.isEnabledFor(player), chestPunch.isSoundEnabledFor(player)).getInventory());
+            } else {
+                player.sendMessage(Component.text("Dafür benötigst du die Berechtigung "
+                        + PERMISSION + ".", NamedTextColor.RED));
+            }
+            return true;
+        }
+
         if (args.length == 0) {
             if (sender instanceof Player player) {
                 player.openInventory(new SigmaMenu(features).getInventory());
@@ -64,6 +79,9 @@ public class SigmaCommand implements TabExecutor {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (sender instanceof Player player && !player.hasPermission(PERMISSION)) {
+            return List.of();
+        }
         List<String> options = new ArrayList<>();
         if (args.length == 1) {
             for (Feature feature : Feature.values()) {

@@ -17,7 +17,7 @@ Die Moderator-Befehle benötigen die Berechtigung `allinoneplugin.mod`, die stan
 
 ## Umschaltbare Funktionen (`/sigma`)
 
-`/sigma` öffnet ein Menü, in dem Funktionen per Linksklick aktiviert oder deaktiviert werden. Bei `NoCreeperGrief` schaltet ein Rechtsklick zusätzlich den Creeper-Schaden um. Über die Konsole oder direkt per Befehl geht das mit `/sigma <Funktion> [on|off]` (ohne `on`/`off` wird umgeschaltet). Der Befehl benötigt `allinoneplugin.sigma` (standardmäßig nur Operatoren). Die Zustände werden unter `features` in der `config.yml` gespeichert.
+`/sigma` öffnet für Spieler mit der Berechtigung `allinoneplugin.sigma` (standardmäßig Operatoren) das Servermenü. Spieler ohne diese Berechtigung gelangen in ihr persönliches Menü wie mit `/menu`; serverweite Einstellungen können sie nicht über `/sigma <Funktion> [on|off]` ändern. Im Servermenü lassen sich Funktionen per Linksklick aktivieren oder deaktivieren. Bei `NoCreeperGrief` schaltet ein Rechtsklick zusätzlich den Creeper-Schaden um. Berechtigte Spieler können die Funktionen auch direkt per Befehl umschalten; über die Konsole geht das ebenfalls. Ohne `on`/`off` wird umgeschaltet. Die Zustände werden unter `features` in der `config.yml` gespeichert.
 
 | Funktion | ID | Beschreibung |
 | --- | --- | --- |

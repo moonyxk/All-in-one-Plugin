@@ -42,7 +42,7 @@ public class AllInOnePlugin extends JavaPlugin {
         // Umschaltbare Funktionen
         FeatureManager features = new FeatureManager(this);
         ChestPunchListener chestPunchListener = new ChestPunchListener(this, features);
-        registerCommand("sigma", new SigmaCommand(features));
+        registerCommand("sigma", new SigmaCommand(features, chestPunchListener));
         registerCommand("menu", new MenuCommand(chestPunchListener));
         registerCommand("chestpunch", new ChestPunchCommand(features, chestPunchListener));
 

@@ -3,6 +3,7 @@ package dev.moonyxk.allinoneplugin;
 import dev.moonyxk.allinoneplugin.features.Feature;
 import dev.moonyxk.allinoneplugin.features.PlayerMenu;
 import dev.moonyxk.allinoneplugin.features.SigmaMenu;
+import dev.moonyxk.allinoneplugin.commands.SigmaCommand;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -242,6 +243,8 @@ class AllInOnePluginTest {
         PlayerMock admin = server.addPlayer("Admin");
         admin.setOp(true);
         assertTrue(plugin.getConfig().getBoolean("features.no-creeper-grief"));
+        assertNull(plugin.getCommand("sigma").getPermission());
+        assertEquals(PermissionDefault.OP, server.getPluginManager().getPermission(SigmaCommand.PERMISSION).getDefault());
 
         assertTrue(admin.performCommand("allinoneplugin:sigma"));
         InventoryView view = admin.getOpenInventory();
@@ -271,7 +274,14 @@ class AllInOnePluginTest {
 
         PlayerMock player = server.addPlayer("Player");
         assertTrue(player.performCommand("allinoneplugin:sigma"));
-        assertFalse(player.getOpenInventory().getTopInventory().getHolder(false) instanceof SigmaMenu);
+        assertInstanceOf(PlayerMenu.class, player.getOpenInventory().getTopInventory().getHolder(false));
+        assertTrue(player.performCommand("allinoneplugin:sigma chest-punch off"));
+        assertTrue(plugin.getConfig().getBoolean("features.chest-punch"));
+
+        PlayerMock permittedPlayer = server.addPlayer("PermittedPlayer");
+        permittedPlayer.addAttachment(plugin, SigmaCommand.PERMISSION, true);
+        assertTrue(permittedPlayer.performCommand("allinoneplugin:sigma"));
+        assertInstanceOf(SigmaMenu.class, permittedPlayer.getOpenInventory().getTopInventory().getHolder(false));
 
         assertTrue(server.dispatchCommand(server.getConsoleSender(), "allinoneplugin:sigma chest-punch off"));
         assertFalse(plugin.getConfig().getBoolean("features.chest-punch"));
