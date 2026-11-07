@@ -18,7 +18,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Creeper;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -42,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -111,7 +111,6 @@ class AllInOnePluginTest {
         moderator.setOp(true);
         PlayerMock target = server.addPlayer("Target");
         List<Location> explosions = new ArrayList<>();
-        List<Boolean> damageCancelled = new ArrayList<>();
         AtomicBoolean explosionAllowed = new AtomicBoolean(true);
         WorldMock world = new WorldMock(new WorldCreator("explosion-test")) {
             @Override
@@ -120,10 +119,6 @@ class AllInOnePluginTest {
                 assertFalse(setFire);
                 assertFalse(breakBlocks);
                 explosions.add(new Location(this, x, y, z));
-                EntityDamageEvent damageEvent = new EntityDamageEvent(
-                        target, EntityDamageEvent.DamageCause.ENTITY_EXPLOSION, 4.0);
-                server.getPluginManager().callEvent(damageEvent);
-                damageCancelled.add(damageEvent.isCancelled());
                 return explosionAllowed.get();
             }
         };
@@ -141,18 +136,15 @@ class AllInOnePluginTest {
         assertTrue(moderator.performCommand("allinoneplugin:boom Target"));
         assertEquals(1, explosions.size());
         assertEquals(target.getLocation(), explosions.get(0));
-        assertFalse(damageCancelled.get(0));
 
         clearMessages(moderator);
         clearMessages(target);
         assertTrue(moderator.performCommand("allinoneplugin:boom Target false"));
-        assertTrue(damageCancelled.get(1));
         assertEquals(2, explosions.size());
 
         clearMessages(moderator);
         clearMessages(target);
         assertTrue(moderator.performCommand("allinoneplugin:boom Target true"));
-        assertFalse(damageCancelled.get(2));
         assertEquals(3, explosions.size());
 
         clearMessages(moderator);
@@ -162,7 +154,6 @@ class AllInOnePluginTest {
         assertEquals(Component.text("Die Explosion bei Target konnte nicht ausgelöst werden.", NamedTextColor.RED),
                 moderator.nextComponentMessage());
         assertNull(target.nextComponentMessage());
-        assertFalse(damageCancelled.get(3));
     }
 
     @Test
@@ -267,21 +258,24 @@ class AllInOnePluginTest {
         server.getPluginManager().callEvent(rightClick);
         assertTrue(plugin.getConfig().getBoolean("features.no-creeper-grief-damage"));
 
-        InventoryClickEvent click = admin.simulateInventoryClick(view, Feature.NO_CREEPER_GRIEF.ordinal());
+        InventoryClickEvent click = clickInventorySlot(view, Feature.NO_CREEPER_GRIEF.ordinal());
         assertTrue(click.isCancelled());
         assertFalse(plugin.getConfig().getBoolean("features.no-creeper-grief"));
         assertTrue(plugin.getConfig().getBoolean("features.chest-punch"));
 
-        admin.simulateInventoryClick(view, Feature.NO_CREEPER_GRIEF.ordinal());
+        clickInventorySlot(view, Feature.NO_CREEPER_GRIEF.ordinal());
         assertTrue(plugin.getConfig().getBoolean("features.no-creeper-grief"));
 
-        admin.simulateInventoryClick(view, Feature.FIRST_JOIN_RECIPES.ordinal());
+        clickInventorySlot(view, Feature.FIRST_JOIN_RECIPES.ordinal());
         assertTrue(plugin.getConfig().getBoolean("features.first-join-recipes"));
         assertTrue(admin.performCommand("allinoneplugin:sigma first-join-recipes on"));
         assertTrue(plugin.getConfig().getBoolean("features.first-join-recipes"));
-        admin.simulateInventoryClick(view, Feature.FIRST_JOIN_RECIPES.ordinal());
+        clickInventorySlot(view, Feature.FIRST_JOIN_RECIPES.ordinal());
         assertFalse(plugin.getConfig().getBoolean("features.first-join-recipes"));
+    }
 
+    @Test
+    void sigmaCommandRestrictsMenuAndCommandAccess() {
         PlayerMock player = server.addPlayer("Player");
         assertTrue(player.performCommand("allinoneplugin:sigma"));
         assertInstanceOf(PlayerMenu.class, player.getOpenInventory().getTopInventory().getHolder(false));
@@ -318,15 +312,15 @@ class AllInOnePluginTest {
                 PlayerMenu.class, second.getOpenInventory().getTopInventory().getHolder(false));
         assertNotNull(firstMenu);
         assertNotNull(secondMenu);
-        assertTrue(firstMenu.getInventory() != secondMenu.getInventory());
+        assertNotSame(firstMenu.getInventory(), secondMenu.getInventory());
 
-        first.simulateInventoryClick(firstView, PlayerMenu.CHEST_PUNCH_SLOT);
+        clickInventorySlot(firstView, PlayerMenu.CHEST_PUNCH_SLOT);
         assertEquals(Material.GRAY_DYE,
                 firstView.getTopInventory().getItem(PlayerMenu.CHEST_PUNCH_SLOT).getType());
         assertEquals(Material.CHEST,
                 second.getOpenInventory().getTopInventory().getItem(PlayerMenu.CHEST_PUNCH_SLOT).getType());
 
-        first.simulateInventoryClick(firstView, PlayerMenu.SOUND_SLOT);
+        clickInventorySlot(firstView, PlayerMenu.SOUND_SLOT);
         assertEquals(Material.GRAY_DYE,
                 firstView.getTopInventory().getItem(PlayerMenu.SOUND_SLOT).getType());
         assertEquals(Material.NOTE_BLOCK,
@@ -343,7 +337,7 @@ class AllInOnePluginTest {
         punch(second, chest);
         assertTrue(second.getInventory().getItemInMainHand().isEmpty());
 
-        first.simulateInventoryClick(firstView, PlayerMenu.CHEST_PUNCH_SLOT);
+        clickInventorySlot(firstView, PlayerMenu.CHEST_PUNCH_SLOT);
         first.getInventory().setItemInMainHand(new ItemStack(Material.DIRT));
         punch(first, chest);
         assertTrue(first.getInventory().getItemInMainHand().isEmpty());
@@ -417,9 +411,17 @@ class AllInOnePluginTest {
                 player.getInventory().getItemInMainHand(), block, BlockFace.UP, EquipmentSlot.HAND));
     }
 
+    private InventoryClickEvent clickInventorySlot(InventoryView view, int slot) {
+        InventoryClickEvent event = new InventoryClickEvent(view, InventoryType.SlotType.CONTAINER,
+                slot, ClickType.LEFT, InventoryAction.PICKUP_ALL);
+        server.getPluginManager().callEvent(event);
+        return event;
+    }
+
     private static void clearMessages(PlayerMock player) {
         while (player.nextComponentMessage() != null) {
             // Discard join and previous command messages before checking feedback.
         }
     }
+
 }

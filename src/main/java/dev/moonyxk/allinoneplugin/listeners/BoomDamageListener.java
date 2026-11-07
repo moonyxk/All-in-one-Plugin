@@ -26,10 +26,14 @@ public class BoomDamageListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityDamage(EntityDamageEvent event) {
-        if (suppressExplosionDamage
-                && (event.getCause() == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION
-                || event.getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)) {
+        if (shouldSuppressExplosionDamage(event.getCause())) {
             event.setCancelled(true);
         }
+    }
+
+    boolean shouldSuppressExplosionDamage(EntityDamageEvent.DamageCause cause) {
+        return suppressExplosionDamage
+                && (cause == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION
+                || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION);
     }
 }

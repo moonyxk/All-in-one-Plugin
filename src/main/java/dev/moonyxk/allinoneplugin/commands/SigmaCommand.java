@@ -29,54 +29,74 @@ public class SigmaCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player player && !player.hasPermission(PERMISSION)) {
-            if (args.length == 0) {
-                player.openInventory(new PlayerMenu(player.getUniqueId(),
-                        chestPunch.isEnabledFor(player), chestPunch.isSoundEnabledFor(player)).getInventory());
-            } else {
-                player.sendMessage(Component.text("Dafür benötigst du die Berechtigung "
-                        + PERMISSION + ".", NamedTextColor.RED));
-            }
+        if (handleUnauthorizedPlayer(sender, args)) {
             return true;
         }
 
         if (args.length == 0) {
-            if (sender instanceof Player player) {
-                player.openInventory(new SigmaMenu(features).getInventory());
-            } else {
-                for (Feature feature : Feature.values()) {
-                    if (feature.commandToggleable()) {
-                        sender.sendMessage(stateMessage(feature, features.isEnabled(feature)));
-                    }
-                }
-            }
+            showOverview(sender);
             return true;
         }
         if (args.length > 2) {
             return false;
         }
+        return toggleFeature(sender, args);
+    }
 
+    private boolean handleUnauthorizedPlayer(CommandSender sender, String[] args) {
+        if (!(sender instanceof Player player) || player.hasPermission(PERMISSION)) {
+            return false;
+        }
+        if (args.length == 0) {
+            player.openInventory(new PlayerMenu(player.getUniqueId(),
+                    chestPunch.isEnabledFor(player), chestPunch.isSoundEnabledFor(player)).getInventory());
+        } else {
+            player.sendMessage(Component.text("Dafür benötigst du die Berechtigung "
+                    + PERMISSION + ".", NamedTextColor.RED));
+        }
+        return true;
+    }
+
+    private void showOverview(CommandSender sender) {
+        if (sender instanceof Player player) {
+            player.openInventory(new SigmaMenu(features).getInventory());
+            return;
+        }
+        for (Feature feature : Feature.values()) {
+            if (feature.commandToggleable()) {
+                sender.sendMessage(stateMessage(feature, features.isEnabled(feature)));
+            }
+        }
+    }
+
+    private boolean toggleFeature(CommandSender sender, String[] args) {
         Feature feature = Feature.byId(args[0]);
         if (feature == null || !feature.commandToggleable()) {
             sender.sendMessage(Component.text("Unbekannte Funktion: " + args[0], NamedTextColor.RED));
             return true;
         }
 
-        boolean enabled;
         if (args.length == 1) {
-            enabled = features.toggle(feature);
-        } else {
-            switch (args[1].toLowerCase(Locale.ROOT)) {
-                case "on" -> enabled = true;
-                case "off" -> enabled = false;
-                default -> {
-                    return false;
-                }
-            }
-            features.setEnabled(feature, enabled);
+            boolean enabled = features.toggle(feature);
+            sender.sendMessage(stateMessage(feature, enabled));
+            return true;
         }
+
+        Boolean enabled = parseEnabled(args[1]);
+        if (enabled == null) {
+            return false;
+        }
+        features.setEnabled(feature, enabled);
         sender.sendMessage(stateMessage(feature, enabled));
         return true;
+    }
+
+    private static Boolean parseEnabled(String value) {
+        return switch (value.toLowerCase(Locale.ROOT)) {
+            case "on" -> true;
+            case "off" -> false;
+            default -> null;
+        };
     }
 
     @Override

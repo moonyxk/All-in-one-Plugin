@@ -22,10 +22,6 @@ public enum Feature {
         this(id, displayName, icon, description, true, true);
     }
 
-    Feature(String id, String displayName, Material icon, String description, boolean commandToggleable) {
-        this(id, displayName, icon, description, commandToggleable, true);
-    }
-
     Feature(String id, String displayName, Material icon, String description,
             boolean commandToggleable, boolean defaultEnabled) {
         this.id = id;
