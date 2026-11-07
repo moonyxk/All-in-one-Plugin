@@ -1,12 +1,26 @@
 package dev.moonyxk.allinoneplugin;
 
+import dev.moonyxk.allinoneplugin.features.Feature;
+import dev.moonyxk.allinoneplugin.features.SigmaMenu;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.WorldCreator;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Container;
+import org.bukkit.entity.Creeper;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionDefault;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +32,7 @@ import org.mockbukkit.mockbukkit.world.WorldMock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -41,7 +56,7 @@ class AllInOnePluginTest {
     @Test
     void enablesAndRegistersCommands() {
         assertTrue(plugin.isEnabled());
-        for (String name : new String[] {"heal", "feed", "fly", "kick", "boom"}) {
+        for (String name : new String[] {"heal", "feed", "fly", "kick", "boom", "sigma", "chestpunch"}) {
             assertNotNull(plugin.getCommand(name), "Command not registered: " + name);
         }
         for (String name : new String[] {"test", "balance", "pay", "shop"}) {
@@ -184,6 +199,83 @@ class AllInOnePluginTest {
         PlayerMock otherTarget = server.addPlayer("OtherTarget");
         assertTrue(operator.performCommand("allinoneplugin:kick OtherTarget Test"));
         assertFalse(otherTarget.isOnline());
+    }
+
+    @Test
+    void sigmaMenuTogglesFeatures() {
+        PlayerMock admin = server.addPlayer("Admin");
+        admin.setOp(true);
+        assertTrue(plugin.getConfig().getBoolean("features.no-creeper-grief"));
+
+        assertTrue(admin.performCommand("allinoneplugin:sigma"));
+        InventoryView view = admin.getOpenInventory();
+        assertInstanceOf(SigmaMenu.class, view.getTopInventory().getHolder(false));
+        assertEquals(Material.CREEPER_HEAD, view.getTopInventory().getItem(Feature.NO_CREEPER_GRIEF.ordinal()).getType());
+
+        InventoryClickEvent click = admin.simulateInventoryClick(view, Feature.NO_CREEPER_GRIEF.ordinal());
+        assertTrue(click.isCancelled());
+        assertFalse(plugin.getConfig().getBoolean("features.no-creeper-grief"));
+        assertTrue(plugin.getConfig().getBoolean("features.chest-punch"));
+
+        admin.simulateInventoryClick(view, Feature.NO_CREEPER_GRIEF.ordinal());
+        assertTrue(plugin.getConfig().getBoolean("features.no-creeper-grief"));
+
+        PlayerMock player = server.addPlayer("Player");
+        assertTrue(player.performCommand("allinoneplugin:sigma"));
+        assertFalse(player.getOpenInventory().getTopInventory().getHolder(false) instanceof SigmaMenu);
+
+        assertTrue(server.dispatchCommand(server.getConsoleSender(), "allinoneplugin:sigma chest-punch off"));
+        assertFalse(plugin.getConfig().getBoolean("features.chest-punch"));
+        assertTrue(server.dispatchCommand(server.getConsoleSender(), "allinoneplugin:sigma chest-punch"));
+        assertTrue(plugin.getConfig().getBoolean("features.chest-punch"));
+    }
+
+    @Test
+    void noCreeperGriefCanBeToggled() {
+        WorldMock world = server.addSimpleWorld("creeper-test");
+        Creeper creeper = world.spawn(new Location(world, 0, 70, 0), Creeper.class);
+
+        ExplosionPrimeEvent event = new ExplosionPrimeEvent(creeper, 3.0F, false);
+        server.getPluginManager().callEvent(event);
+        assertEquals(-3.0F, event.getRadius());
+
+        assertTrue(server.dispatchCommand(server.getConsoleSender(), "allinoneplugin:sigma no-creeper-grief off"));
+        event = new ExplosionPrimeEvent(creeper, 3.0F, false);
+        server.getPluginManager().callEvent(event);
+        assertEquals(3.0F, event.getRadius());
+    }
+
+    @Test
+    void chestPunchStoresHeldItemAndCanBeToggled() {
+        WorldMock world = server.addSimpleWorld("chest-test");
+        Block chest = world.getBlockAt(0, 70, 0);
+        chest.setType(Material.CHEST);
+        PlayerMock player = server.addPlayer("Player");
+
+        player.getInventory().setItemInMainHand(new ItemStack(Material.DIRT, 16));
+        punch(player, chest);
+        assertTrue(player.getInventory().getItemInMainHand().isEmpty());
+        assertTrue(((Container) chest.getState()).getInventory().contains(Material.DIRT, 16));
+
+        assertTrue(player.performCommand("allinoneplugin:chestpunch"));
+        player.getInventory().setItemInMainHand(new ItemStack(Material.STONE));
+        punch(player, chest);
+        assertEquals(Material.STONE, player.getInventory().getItemInMainHand().getType());
+
+        assertTrue(player.performCommand("allinoneplugin:chestpunch"));
+        assertTrue(server.dispatchCommand(server.getConsoleSender(), "allinoneplugin:sigma chest-punch off"));
+        punch(player, chest);
+        assertEquals(Material.STONE, player.getInventory().getItemInMainHand().getType());
+
+        assertTrue(server.dispatchCommand(server.getConsoleSender(), "allinoneplugin:sigma chest-punch on"));
+        player.getInventory().setItemInMainHand(new ItemStack(Material.IRON_AXE));
+        punch(player, chest);
+        assertEquals(Material.IRON_AXE, player.getInventory().getItemInMainHand().getType());
+    }
+
+    private void punch(PlayerMock player, Block block) {
+        server.getPluginManager().callEvent(new PlayerInteractEvent(player, Action.LEFT_CLICK_BLOCK,
+                player.getInventory().getItemInMainHand(), block, BlockFace.UP, EquipmentSlot.HAND));
     }
 
     private static void clearMessages(PlayerMock player) {

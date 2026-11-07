@@ -25,7 +25,21 @@ commands:
     description: Erzeugt eine Explosion um einen Spieler.
     usage: /boom <Spieler>
     permission: allinoneplugin.mod
+  sigma:
+    description: Öffnet das Menü zum Aktivieren und Deaktivieren von Funktionen.
+    usage: /sigma [Funktion] [on|off]
+    permission: allinoneplugin.sigma
+  chestpunch:
+    description: Schaltet ChestPunch für dich selbst ein oder aus.
+    usage: /chestpunch
+    permission: allinoneplugin.chestpunch
 permissions:
   allinoneplugin.mod:
     description: Erlaubt die Nutzung der Moderator-Befehle.
     default: op
+  allinoneplugin.sigma:
+    description: Erlaubt das Aktivieren und Deaktivieren von Funktionen über /sigma.
+    default: op
+  allinoneplugin.chestpunch:
+    description: Erlaubt die Nutzung von ChestPunch.
+    default: true

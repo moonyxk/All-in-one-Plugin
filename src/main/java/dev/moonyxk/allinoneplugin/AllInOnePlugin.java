@@ -5,11 +5,17 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import dev.moonyxk.allinoneplugin.commands.BoomCommand;
+import dev.moonyxk.allinoneplugin.commands.ChestPunchCommand;
 import dev.moonyxk.allinoneplugin.commands.FeedCommand;
 import dev.moonyxk.allinoneplugin.commands.FlyCommand;
 import dev.moonyxk.allinoneplugin.commands.HealCommand;
 import dev.moonyxk.allinoneplugin.commands.KickCommand;
+import dev.moonyxk.allinoneplugin.commands.SigmaCommand;
+import dev.moonyxk.allinoneplugin.features.FeatureManager;
+import dev.moonyxk.allinoneplugin.features.SigmaMenuListener;
 import dev.moonyxk.allinoneplugin.listeners.BlockBreakListener;
+import dev.moonyxk.allinoneplugin.listeners.ChestPunchListener;
+import dev.moonyxk.allinoneplugin.listeners.CreeperExplosionListener;
 import dev.moonyxk.allinoneplugin.listeners.PlayerChatListener;
 import dev.moonyxk.allinoneplugin.listeners.PlayerJoinListener;
 
@@ -29,10 +35,19 @@ public class AllInOnePlugin extends JavaPlugin {
         registerCommand("kick", new KickCommand());
         registerCommand("boom", new BoomCommand());
 
+        // Umschaltbare Funktionen
+        FeatureManager features = new FeatureManager(this);
+        ChestPunchListener chestPunchListener = new ChestPunchListener(this, features);
+        registerCommand("sigma", new SigmaCommand(features));
+        registerCommand("chestpunch", new ChestPunchCommand(features, chestPunchListener));
+
         // Event-Listener registrieren
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerChatListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new SigmaMenuListener(features), this);
+        Bukkit.getPluginManager().registerEvents(chestPunchListener, this);
+        Bukkit.getPluginManager().registerEvents(new CreeperExplosionListener(features), this);
     }
 
     private void registerCommand(String name, CommandExecutor executor) {

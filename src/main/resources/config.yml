@@ -2,3 +2,8 @@
 
 # Join-Nachricht. %player% wird durch den Spielernamen ersetzt.
 join-message: "&aWillkommen, %player%!"
+
+# Umschaltbare Funktionen (auch im Spiel über /sigma änderbar).
+features:
+  chest-punch: true
+  no-creeper-grief: true
