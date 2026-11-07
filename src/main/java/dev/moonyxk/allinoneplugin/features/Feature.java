@@ -7,18 +7,26 @@ public enum Feature {
     CHEST_PUNCH("chest-punch", "ChestPunch", Material.CHEST,
             "Gegenstände per Linksklick in Truhen, Fässer, Spender, Werfer und Trichter legen."),
     NO_CREEPER_GRIEF("no-creeper-grief", "NoCreeperGrief", Material.CREEPER_HEAD,
-            "Creeper-Explosionen zerstören keine Blöcke; Schaden ist separat einstellbar.");
+            "Creeper-Explosionen zerstören keine Blöcke; Schaden ist separat einstellbar."),
+    FIRST_JOIN_RECIPES("first-join-recipes", "Alle Rezepte beim ersten Beitritt", Material.KNOWLEDGE_BOOK,
+            "Gibt neuen Spielern beim ersten Beitritt alle Rezepte.", false);
 
     private final String id;
     private final String displayName;
     private final Material icon;
     private final String description;
+    private final boolean commandToggleable;
 
     Feature(String id, String displayName, Material icon, String description) {
+        this(id, displayName, icon, description, true);
+    }
+
+    Feature(String id, String displayName, Material icon, String description, boolean commandToggleable) {
         this.id = id;
         this.displayName = displayName;
         this.icon = icon;
         this.description = description;
+        this.commandToggleable = commandToggleable;
     }
 
     public String id() {
@@ -35,6 +43,10 @@ public enum Feature {
 
     public String description() {
         return description;
+    }
+
+    public boolean commandToggleable() {
+        return commandToggleable;
     }
 
     public static Feature byId(String id) {

@@ -45,7 +45,9 @@ public class SigmaCommand implements TabExecutor {
                 player.openInventory(new SigmaMenu(features).getInventory());
             } else {
                 for (Feature feature : Feature.values()) {
-                    sender.sendMessage(stateMessage(feature, features.isEnabled(feature)));
+                    if (feature.commandToggleable()) {
+                        sender.sendMessage(stateMessage(feature, features.isEnabled(feature)));
+                    }
                 }
             }
             return true;
@@ -55,7 +57,7 @@ public class SigmaCommand implements TabExecutor {
         }
 
         Feature feature = Feature.byId(args[0]);
-        if (feature == null) {
+        if (feature == null || !feature.commandToggleable()) {
             sender.sendMessage(Component.text("Unbekannte Funktion: " + args[0], NamedTextColor.RED));
             return true;
         }
@@ -85,7 +87,9 @@ public class SigmaCommand implements TabExecutor {
         List<String> options = new ArrayList<>();
         if (args.length == 1) {
             for (Feature feature : Feature.values()) {
-                options.add(feature.id());
+                if (feature.commandToggleable()) {
+                    options.add(feature.id());
+                }
             }
         } else if (args.length == 2) {
             options.add("on");

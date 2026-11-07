@@ -47,7 +47,7 @@ public class AllInOnePlugin extends JavaPlugin {
         registerCommand("chestpunch", new ChestPunchCommand(features, chestPunchListener));
 
         // Event-Listener registrieren
-        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this, features), this);
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerChatListener(this), this);
         Bukkit.getPluginManager().registerEvents(boomDamageListener, this);

@@ -250,6 +250,8 @@ class AllInOnePluginTest {
         InventoryView view = admin.getOpenInventory();
         assertInstanceOf(SigmaMenu.class, view.getTopInventory().getHolder(false));
         assertEquals(Material.CREEPER_HEAD, view.getTopInventory().getItem(Feature.NO_CREEPER_GRIEF.ordinal()).getType());
+        assertEquals(Material.KNOWLEDGE_BOOK,
+                view.getTopInventory().getItem(Feature.FIRST_JOIN_RECIPES.ordinal()).getType());
 
         InventoryClickEvent rightClick = new InventoryClickEvent(
                 view, InventoryType.SlotType.CONTAINER, Feature.NO_CREEPER_GRIEF.ordinal(),
@@ -271,6 +273,13 @@ class AllInOnePluginTest {
 
         admin.simulateInventoryClick(view, Feature.NO_CREEPER_GRIEF.ordinal());
         assertTrue(plugin.getConfig().getBoolean("features.no-creeper-grief"));
+
+        admin.simulateInventoryClick(view, Feature.FIRST_JOIN_RECIPES.ordinal());
+        assertFalse(plugin.getConfig().getBoolean("features.first-join-recipes"));
+        assertTrue(admin.performCommand("allinoneplugin:sigma first-join-recipes on"));
+        assertFalse(plugin.getConfig().getBoolean("features.first-join-recipes"));
+        admin.simulateInventoryClick(view, Feature.FIRST_JOIN_RECIPES.ordinal());
+        assertTrue(plugin.getConfig().getBoolean("features.first-join-recipes"));
 
         PlayerMock player = server.addPlayer("Player");
         assertTrue(player.performCommand("allinoneplugin:sigma"));
