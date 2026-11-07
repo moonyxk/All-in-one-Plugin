@@ -50,7 +50,7 @@ mvn clean package
 Das Plugin-JAR wird hier erzeugt:
 
 ```text
-target/All-in-One-Plugin-1.0-SNAPSHOT.jar
+target/All-in-One-Plugin-1.0.jar
 ```
 
 Kopiere die JAR-Datei in den `plugins`-Ordner deines Paper-Servers und starte den Server.
