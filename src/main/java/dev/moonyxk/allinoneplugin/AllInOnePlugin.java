@@ -14,6 +14,7 @@ import dev.moonyxk.allinoneplugin.commands.SigmaCommand;
 import dev.moonyxk.allinoneplugin.features.FeatureManager;
 import dev.moonyxk.allinoneplugin.features.SigmaMenuListener;
 import dev.moonyxk.allinoneplugin.listeners.BlockBreakListener;
+import dev.moonyxk.allinoneplugin.listeners.BoomDamageListener;
 import dev.moonyxk.allinoneplugin.listeners.ChestPunchListener;
 import dev.moonyxk.allinoneplugin.listeners.CreeperExplosionListener;
 import dev.moonyxk.allinoneplugin.listeners.PlayerChatListener;
@@ -33,7 +34,8 @@ public class AllInOnePlugin extends JavaPlugin {
         registerCommand("feed", new FeedCommand());
         registerCommand("fly", new FlyCommand());
         registerCommand("kick", new KickCommand());
-        registerCommand("boom", new BoomCommand());
+        BoomDamageListener boomDamageListener = new BoomDamageListener();
+        registerCommand("boom", new BoomCommand(boomDamageListener));
 
         // Umschaltbare Funktionen
         FeatureManager features = new FeatureManager(this);
@@ -45,6 +47,7 @@ public class AllInOnePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerChatListener(this), this);
+        Bukkit.getPluginManager().registerEvents(boomDamageListener, this);
         Bukkit.getPluginManager().registerEvents(new SigmaMenuListener(features), this);
         Bukkit.getPluginManager().registerEvents(chestPunchListener, this);
         Bukkit.getPluginManager().registerEvents(new CreeperExplosionListener(features), this);

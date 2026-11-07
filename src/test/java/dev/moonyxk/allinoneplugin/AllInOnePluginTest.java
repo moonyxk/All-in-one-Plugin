@@ -15,6 +15,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Creeper;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -103,6 +104,7 @@ class AllInOnePluginTest {
         moderator.setOp(true);
         PlayerMock target = server.addPlayer("Target");
         List<Location> explosions = new ArrayList<>();
+        List<Boolean> damageCancelled = new ArrayList<>();
         AtomicBoolean explosionAllowed = new AtomicBoolean(true);
         WorldMock world = new WorldMock(new WorldCreator("explosion-test")) {
             @Override
@@ -111,16 +113,40 @@ class AllInOnePluginTest {
                 assertFalse(setFire);
                 assertFalse(breakBlocks);
                 explosions.add(new Location(this, x, y, z));
+                EntityDamageEvent damageEvent = new EntityDamageEvent(
+                        target, EntityDamageEvent.DamageCause.ENTITY_EXPLOSION, 4.0);
+                server.getPluginManager().callEvent(damageEvent);
+                damageCancelled.add(damageEvent.isCancelled());
                 return explosionAllowed.get();
             }
         };
         server.addWorld(world);
         assertTrue(target.teleport(new Location(world, 12, 70, -8)));
         assertTrue(moderator.teleport(new Location(world, -12, 70, 8)));
+        clearMessages(moderator);
+        clearMessages(target);
+
+        assertTrue(moderator.performCommand("allinoneplugin:boom Target maybe"));
+        assertEquals(Component.text("Bitte gib für damage true oder false an.", NamedTextColor.RED),
+                moderator.nextComponentMessage());
+        assertTrue(explosions.isEmpty());
 
         assertTrue(moderator.performCommand("allinoneplugin:boom Target"));
         assertEquals(1, explosions.size());
         assertEquals(target.getLocation(), explosions.get(0));
+        assertFalse(damageCancelled.get(0));
+
+        clearMessages(moderator);
+        clearMessages(target);
+        assertTrue(moderator.performCommand("allinoneplugin:boom Target false"));
+        assertTrue(damageCancelled.get(1));
+        assertEquals(2, explosions.size());
+
+        clearMessages(moderator);
+        clearMessages(target);
+        assertTrue(moderator.performCommand("allinoneplugin:boom Target true"));
+        assertFalse(damageCancelled.get(2));
+        assertEquals(3, explosions.size());
 
         clearMessages(moderator);
         clearMessages(target);
@@ -129,6 +155,7 @@ class AllInOnePluginTest {
         assertEquals(Component.text("Die Explosion bei Target konnte nicht ausgelöst werden.", NamedTextColor.RED),
                 moderator.nextComponentMessage());
         assertNull(target.nextComponentMessage());
+        assertFalse(damageCancelled.get(3));
     }
 
     @Test
@@ -145,7 +172,10 @@ class AllInOnePluginTest {
 
         for (String name : new String[] {"heal", "feed", "fly", "boom"}) {
             assertFalse(moderator.performCommand("allinoneplugin:" + name));
-            assertEquals(Component.text("/" + name + " <Spieler>"),
+            String usage = name.equals("boom")
+                    ? "/boom <Spieler> [true|false]"
+                    : "/" + name + " <Spieler>";
+            assertEquals(Component.text(usage),
                     moderator.nextComponentMessage());
             assertTrue(moderator.performCommand("allinoneplugin:" + name + " Offline"));
             assertEquals(Component.text("Spieler nicht gefunden.", NamedTextColor.RED), moderator.nextComponentMessage());

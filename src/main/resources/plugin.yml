@@ -22,8 +22,8 @@ commands:
     usage: /kick <Spieler> <Grund>
     permission: allinoneplugin.mod
   boom:
-    description: Erzeugt eine Explosion um einen Spieler.
-    usage: /boom <Spieler>
+    description: Erzeugt eine Explosion um einen Spieler, optional ohne Schaden.
+    usage: /boom <Spieler> [true|false]
     permission: allinoneplugin.mod
   sigma:
     description: Öffnet das Menü zum Aktivieren und Deaktivieren von Funktionen.
