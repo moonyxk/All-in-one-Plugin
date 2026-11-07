@@ -11,16 +11,20 @@ public class BoomCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            Location loc = player.getLocation();
-            World world = player.getWorld();
+        Player target = CommandTarget.findPlayer(sender, label, args);
+        if (target == null) {
+            return true;
+        }
 
-            // Explosion auslösen
-            world.createExplosion(loc.getX(), loc.getY(), loc.getZ(), 3.0f, false, false);
-            player.sendMessage("§cBOOM!");
-        } else {
-            sender.sendMessage("Dieser Befehl kann nur von einem Spieler ausgeführt werden.");
+        Location loc = target.getLocation();
+        World world = target.getWorld();
+        if (!world.createExplosion(loc.getX(), loc.getY(), loc.getZ(), 3.0f, false, false)) {
+            sender.sendMessage("§cDie Explosion bei " + target.getName() + " konnte nicht ausgelöst werden.");
+            return true;
+        }
+        target.sendMessage("§cBOOM!");
+        if (!sender.equals(target)) {
+            sender.sendMessage("§aExplosion bei " + target.getName() + " ausgelöst.");
         }
         return true;
     }

@@ -9,13 +9,17 @@ public class FlyCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            boolean isFlying = player.getAllowFlight();
-            player.setAllowFlight(!isFlying);
-            player.sendMessage("§aFliegen " + (isFlying ? "§cdeaktiviert" : "§aaktiviert") + "!");
-        } else {
-            sender.sendMessage("Dieser Befehl kann nur von einem Spieler ausgeführt werden.");
+        Player target = CommandTarget.findPlayer(sender, label, args);
+        if (target == null) {
+            return true;
+        }
+
+        boolean isFlying = target.getAllowFlight();
+        target.setAllowFlight(!isFlying);
+        String state = isFlying ? "§cdeaktiviert" : "§aaktiviert";
+        target.sendMessage("§aFliegen " + state + "!");
+        if (!sender.equals(target)) {
+            sender.sendMessage("§aFliegen für " + target.getName() + " " + state + "!");
         }
         return true;
     }

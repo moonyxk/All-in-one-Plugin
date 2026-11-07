@@ -1,7 +1,6 @@
 package dev.moonyxk.allinoneplugin;
 
 import org.bukkit.Bukkit;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import dev.moonyxk.allinoneplugin.commands.*;
 import dev.moonyxk.allinoneplugin.listeners.BlockBreakListener;
@@ -23,12 +22,7 @@ public class AllInOnePlugin extends JavaPlugin {
         getCommand("feed").setExecutor(new FeedCommand());
         getCommand("fly").setExecutor(new FlyCommand());
         getCommand("kick").setExecutor(new KickCommand());
-        getCommand("test").setExecutor(new TestCommand());
         getCommand("boom").setExecutor(new BoomCommand());
-        getCommand("shop").setExecutor(new ShopCommand(this));
-        // Befehle und Events registrieren
-        getCommand("balance").setExecutor(new BalanceCommand(this));
-        getCommand("pay").setExecutor(new PayCommand(this));
 
         // Event-Listener registrieren
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this), this);

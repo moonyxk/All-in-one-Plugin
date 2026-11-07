@@ -6,15 +6,13 @@ Ein Plugin für **Paper 26.3**. Entwickelt für **Java 25**.
 
 | Befehl | Funktion |
 | --- | --- |
-| `/test` | Gibt eine Testnachricht aus. |
-| `/heal` | Heilt dich und füllt deine Hungeranzeige auf. |
-| `/feed` | Füllt deine Hungeranzeige auf. |
-| `/fly` | Schaltet das Fliegen ein oder aus. |
-| `/boom` | Erzeugt eine Explosion, die keine Blöcke zerstört. |
-| `/kick <Spieler> <Grund>` | Entfernt einen Spieler mit Begründung vom Server. Standardmäßig nur für Operatoren (`allinoneplugin.kick`). |
-| `/balance` | Zeigt dein Coins-Guthaben an. |
-| `/pay <Spieler> <Betrag>` | Sendet Coins an einen anderen Spieler. |
-| `/shop <Item> <Preis>` | Kauft ein Item für den angegebenen Preis. |
+| `/heal <Spieler>` | Heilt den Spieler und füllt seine Hungeranzeige auf. |
+| `/feed <Spieler>` | Füllt die Hungeranzeige des Spielers auf. |
+| `/fly <Spieler>` | Schaltet das Fliegen für den Spieler ein oder aus. |
+| `/boom <Spieler>` | Erzeugt beim Spieler eine Explosion, die keine Blöcke zerstört. |
+| `/kick <Spieler> <Grund>` | Entfernt einen Spieler mit Begründung vom Server. |
+
+Alle Befehle benötigen die Berechtigung `allinoneplugin.mod`, die standardmäßig Operatoren vorbehalten ist. Der Spielername ist verpflichtend; die Befehle können auch über die Serverkonsole ausgeführt werden.
 
 Zusätzliche Funktionen:
 
@@ -60,9 +58,3 @@ Dieses Projekt verwendet **Maven**, nicht Gradle. Ein Gradle-Wrapper (`gradlew`)
 Für lokale Builds steht die Plugin-Version als `plugin.version` in der `pom.xml`. Bei Releases wird sie automatisch aus dem Tag übernommen; Zeichen außerhalb von Buchstaben, Ziffern, Punkt, Unterstrich und Bindestrich werden durch Bindestriche ersetzt.
 
 Ein vorhandenes Release-JAR mit demselben Namen wird ersetzt. GitHub startet keinen Release-Workflow für Releases, die ein anderer Workflow mit `GITHUB_TOKEN` erstellt; dieser muss das JAR selbst anhängen. Bei unveränderlichen Releases müssen Assets bereits vor der Veröffentlichung angehängt werden.
-
-## Einschränkungen
-
-- Coins werden nur im Arbeitsspeicher gespeichert und gehen beim Neustart des Servers verloren.
-- `/shop` verwendet den beim Befehl eingegebenen Preis. Auch ein negativer Preis wird derzeit akzeptiert; der Economy-Code zahlt in diesem Fall Coins aus, statt sie abzuziehen. Verwende den Shop deshalb nur mit vertrauenswürdigen Spielern.
-- Nur `/kick` ist durch ein Plugin-Permission-Node beschränkt; dieses Node ist standardmäßig Operatoren vorbehalten. Für die anderen Befehle sind keine eigenen Berechtigungen definiert.

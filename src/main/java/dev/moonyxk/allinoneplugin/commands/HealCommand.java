@@ -9,14 +9,16 @@ public class HealCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            // Spieler heilen
-            player.setHealth(player.getMaxHealth());
-            player.setFoodLevel(20);
-            player.sendMessage("§aDu wurdest geheilt!");
-        } else {
-            sender.sendMessage("Dieser Befehl kann nur von einem Spieler ausgeführt werden.");
+        Player target = CommandTarget.findPlayer(sender, label, args);
+        if (target == null) {
+            return true;
+        }
+
+        target.setHealth(target.getMaxHealth());
+        target.setFoodLevel(20);
+        target.sendMessage("§aDu wurdest geheilt!");
+        if (!sender.equals(target)) {
+            sender.sendMessage("§a" + target.getName() + " wurde geheilt!");
         }
         return true;
     }

@@ -9,12 +9,15 @@ public class FeedCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            player.setFoodLevel(20);
-            player.sendMessage("§aDein Hunger wurde aufgefüllt!");
-        } else {
-            sender.sendMessage("Dieser Befehl kann nur von einem Spieler ausgeführt werden.");
+        Player target = CommandTarget.findPlayer(sender, label, args);
+        if (target == null) {
+            return true;
+        }
+
+        target.setFoodLevel(20);
+        target.sendMessage("§aDein Hunger wurde aufgefüllt!");
+        if (!sender.equals(target)) {
+            sender.sendMessage("§aDer Hunger von " + target.getName() + " wurde aufgefüllt!");
         }
         return true;
     }
