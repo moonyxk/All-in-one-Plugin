@@ -17,7 +17,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Enderman;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -234,6 +236,7 @@ class AllInOnePluginTest {
         PlayerMock admin = server.addPlayer("Admin");
         admin.setOp(true);
         assertTrue(plugin.getConfig().getBoolean("features.no-creeper-grief"));
+        assertTrue(plugin.getConfig().getBoolean("features.no-enderman-grief"));
         assertFalse(plugin.getConfig().getBoolean("features.first-join-recipes"));
         assertNull(plugin.getCommand("sigma").getPermission());
         assertEquals(PermissionDefault.OP, server.getPluginManager().getPermission(SigmaCommand.PERMISSION).getDefault());
@@ -242,8 +245,15 @@ class AllInOnePluginTest {
         InventoryView view = admin.getOpenInventory();
         assertInstanceOf(SigmaMenu.class, view.getTopInventory().getHolder(false));
         assertEquals(Material.CREEPER_HEAD, view.getTopInventory().getItem(Feature.NO_CREEPER_GRIEF.ordinal()).getType());
+        assertEquals(Material.ENDERMAN_SPAWN_EGG,
+                view.getTopInventory().getItem(Feature.NO_ENDERMAN_GRIEF.ordinal()).getType());
         assertEquals(Material.KNOWLEDGE_BOOK,
                 view.getTopInventory().getItem(Feature.FIRST_JOIN_RECIPES.ordinal()).getType());
+
+        clickInventorySlot(view, Feature.NO_ENDERMAN_GRIEF.ordinal());
+        assertFalse(plugin.getConfig().getBoolean("features.no-enderman-grief"));
+        clickInventorySlot(view, Feature.NO_ENDERMAN_GRIEF.ordinal());
+        assertTrue(plugin.getConfig().getBoolean("features.no-enderman-grief"));
 
         InventoryClickEvent rightClick = new InventoryClickEvent(
                 view, InventoryType.SlotType.CONTAINER, Feature.NO_CREEPER_GRIEF.ordinal(),
@@ -272,6 +282,27 @@ class AllInOnePluginTest {
         assertTrue(plugin.getConfig().getBoolean("features.first-join-recipes"));
         clickInventorySlot(view, Feature.FIRST_JOIN_RECIPES.ordinal());
         assertFalse(plugin.getConfig().getBoolean("features.first-join-recipes"));
+    }
+
+    @Test
+    void noEndermanGriefCanBeToggled() {
+        WorldMock world = server.addSimpleWorld("enderman-test");
+        Enderman enderman = world.spawn(new Location(world, 0, 70, 0), Enderman.class);
+        Block block = world.getBlockAt(1, 70, 0);
+        block.setType(Material.DIRT);
+
+        EntityChangeBlockEvent event = new EntityChangeBlockEvent(enderman, block, Material.AIR.createBlockData());
+        server.getPluginManager().callEvent(event);
+        assertTrue(event.isCancelled());
+
+        event = new EntityChangeBlockEvent(enderman, block, Material.STONE.createBlockData());
+        server.getPluginManager().callEvent(event);
+        assertFalse(event.isCancelled());
+
+        assertTrue(server.dispatchCommand(server.getConsoleSender(), "allinoneplugin:sigma no-enderman-grief off"));
+        event = new EntityChangeBlockEvent(enderman, block, Material.AIR.createBlockData());
+        server.getPluginManager().callEvent(event);
+        assertFalse(event.isCancelled());
     }
 
     @Test

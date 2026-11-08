@@ -8,4 +8,5 @@ features:
   chest-punch: true
   no-creeper-grief: true
   no-creeper-grief-damage: true
+  no-enderman-grief: true
   first-join-recipes: false

@@ -19,6 +19,7 @@ import dev.moonyxk.allinoneplugin.listeners.BlockBreakListener;
 import dev.moonyxk.allinoneplugin.listeners.BoomDamageListener;
 import dev.moonyxk.allinoneplugin.listeners.ChestPunchListener;
 import dev.moonyxk.allinoneplugin.listeners.CreeperExplosionListener;
+import dev.moonyxk.allinoneplugin.listeners.EndermanGriefListener;
 import dev.moonyxk.allinoneplugin.listeners.PlayerChatListener;
 import dev.moonyxk.allinoneplugin.listeners.PlayerJoinListener;
 
@@ -55,6 +56,7 @@ public class AllInOnePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerMenuListener(chestPunchListener), this);
         Bukkit.getPluginManager().registerEvents(chestPunchListener, this);
         Bukkit.getPluginManager().registerEvents(new CreeperExplosionListener(features), this);
+        Bukkit.getPluginManager().registerEvents(new EndermanGriefListener(features), this);
     }
 
     private void registerCommand(String name, CommandExecutor executor) {

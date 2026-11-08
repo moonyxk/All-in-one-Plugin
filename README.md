@@ -23,6 +23,7 @@ Die Moderator-Befehle benötigen die Berechtigung `allinoneplugin.mod`, die stan
 | --- | --- | --- |
 | ChestPunch | `chest-punch` | Ein Linksklick mit einem Gegenstand auf eine Truhe, Falltruhe oder ein Fass (nicht mit einer Axt) bzw. auf einen Spender, Werfer oder Trichter (nicht mit einer Spitzhacke) legt den Stapel hinein. Nicht beim Schleichen. Jeder Spieler kann ChestPunch und den Sound im persönlichen `/menu` unabhängig für sich ein- oder ausschalten. Alternativ schaltet `/chestpunch` ChestPunch für den Spieler um (Berechtigung `allinoneplugin.chestpunch`, standardmäßig für alle). |
 | NoCreeperGrief | `no-creeper-grief` | Creeper-Explosionen zerstören keine Blöcke; ob sie Spielern und Entities Schaden zufügen, lässt sich per Rechtsklick im Menü umschalten. |
+| NoEndermanGrief | `no-enderman-grief` | Verhindert, dass Endermen Blöcke aufnehmen. Das Platzieren bereits getragener Blöcke bleibt unverändert. |
 
 Zusätzliche Funktionen:
 

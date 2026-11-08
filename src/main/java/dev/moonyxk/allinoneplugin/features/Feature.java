@@ -8,6 +8,8 @@ public enum Feature {
             "Gegenstände per Linksklick in Truhen, Fässer, Spender, Werfer und Trichter legen."),
     NO_CREEPER_GRIEF("no-creeper-grief", "NoCreeperGrief", Material.CREEPER_HEAD,
             "Creeper-Explosionen zerstören keine Blöcke; Schaden ist separat einstellbar."),
+    NO_ENDERMAN_GRIEF("no-enderman-grief", "NoEndermanGrief", Material.ENDERMAN_SPAWN_EGG,
+            "Endermen können keine Blöcke mehr aufnehmen."),
     FIRST_JOIN_RECIPES("first-join-recipes", "Alle Rezepte beim ersten Beitritt", Material.KNOWLEDGE_BOOK,
             "Gibt neuen Spielern beim ersten Beitritt alle Rezepte.", false, false);
 
