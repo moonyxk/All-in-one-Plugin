@@ -55,7 +55,6 @@ public class AllInOnePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this, features), this);
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerChatListener(this), this);
-        Bukkit.getPluginManager().registerEvents(boomDamageListener, this);
         Bukkit.getPluginManager().registerEvents(new SigmaMenuListener(this, features), this);
         Bukkit.getPluginManager().registerEvents(new PlayerMenuListener(this, chestPunchListener), this);
         Bukkit.getPluginManager().registerEvents(chestPunchListener, this);

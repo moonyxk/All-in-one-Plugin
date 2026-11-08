@@ -204,7 +204,7 @@ class AllInOnePluginTest {
         clearMessages(moderator);
         clearMessages(target);
         assertTrue(moderator.performCommand("allinoneplugin:jumpscare Target"));
-        assertEquals(2, explosions.size());
+        assertEquals(1, explosions.size());
 
         assertEquals(Component.text("BOOM!", NamedTextColor.RED), target.nextComponentMessage());
         assertEquals(Component.text("Jumpscare bei Target ausgelöst.", NamedTextColor.GREEN),

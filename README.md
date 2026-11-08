@@ -10,7 +10,7 @@ Ein Plugin für **Paper 26.3**. Entwickelt für **Java 25**.
 | `/feed <Spieler>` | Füllt die Hungeranzeige des Spielers auf. |
 | `/fly <Spieler>` | Schaltet das Fliegen für den Spieler ein oder aus. |
 | `/boom <Spieler>` | Erzeugt beim Spieler eine Explosion, die keine Blöcke zerstört, aber Schaden verursacht. |
-| `/jumpscare <Spieler>` | Erzeugt beim Spieler eine Explosion, die weder Blöcke zerstört noch Schaden verursacht. |
+| `/jumpscare <Spieler>` | Spielt beim Spieler einen Explosions-Effekt ab, ohne eine echte Explosion auszulösen oder Schaden und Blockschaden zu verursachen. |
 | `/kick <Spieler> <Grund>` | Entfernt einen Spieler mit Begründung vom Server. |
 | `/menu` | Öffnet dein persönliches Menü für ChestPunch und den ChestPunch-Sound. |
 
