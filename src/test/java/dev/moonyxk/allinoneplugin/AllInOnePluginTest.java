@@ -82,12 +82,46 @@ class AllInOnePluginTest {
         plugin.getConfig().set("join-message", "&bWelcome, %player%!");
         plugin.getConfig().set("join-broadcast-message", "&d%player% joined!");
 
-        server.getPluginManager().callEvent(new PlayerJoinEvent(player, Component.empty()));
+        PlayerJoinEvent event = new PlayerJoinEvent(player, Component.text("Visitor joined the game"));
+        server.getPluginManager().callEvent(event);
 
+        assertEquals(Component.text("Visitor joined!", NamedTextColor.LIGHT_PURPLE), event.joinMessage());
         assertEquals(Component.text("Welcome, Visitor!", NamedTextColor.AQUA),
                 player.nextComponentMessage());
-        assertEquals(Component.text("Visitor joined!", NamedTextColor.LIGHT_PURPLE),
+        assertNull(player.nextComponentMessage());
+    }
+
+    @Test
+    void updateNoticeIsSentOnlyToOpsOnEveryJoin() {
+        plugin.setAvailableUpdateVersion("1.0.5");
+        plugin.getConfig().set("update-check.operator-join-message",
+                "&eUpdate %latest%, current %current%, %url%");
+        PlayerMock admin = server.addPlayer("Admin");
+        admin.setOp(true);
+        clearMessages(admin);
+
+        PlayerJoinEvent event = new PlayerJoinEvent(admin, Component.empty());
+        server.getPluginManager().callEvent(event);
+        assertEquals(Component.text("Willkommen, Admin!", NamedTextColor.GREEN),
+                admin.nextComponentMessage());
+        assertEquals(Component.text(
+                "Update 1.0.5, current 1.0.4, https://github.com/moonyxk/All-in-one-Plugin/releases/latest",
+                NamedTextColor.YELLOW), admin.nextComponentMessage());
+
+        clearMessages(admin);
+        server.getPluginManager().callEvent(new PlayerJoinEvent(admin, Component.empty()));
+        assertEquals(Component.text("Willkommen, Admin!", NamedTextColor.GREEN),
+                admin.nextComponentMessage());
+        assertEquals(Component.text(
+                "Update 1.0.5, current 1.0.4, https://github.com/moonyxk/All-in-one-Plugin/releases/latest",
+                NamedTextColor.YELLOW), admin.nextComponentMessage());
+
+        PlayerMock player = server.addPlayer("Player");
+        clearMessages(player);
+        server.getPluginManager().callEvent(new PlayerJoinEvent(player, Component.empty()));
+        assertEquals(Component.text("Willkommen, Player!", NamedTextColor.GREEN),
                 player.nextComponentMessage());
+        assertNull(player.nextComponentMessage());
     }
 
     @Test

@@ -83,11 +83,13 @@ class UpdateCheckerTest {
         respond(302, "https://github.com/moonyxk/All-in-one-Plugin/releases/tag/v1.0.4");
         URI uri = URI.create("http://127.0.0.1:" + server.getAddress().getPort() + "/latest");
         new UpdateChecker("1.0.3", logger, uri,
-                "Update %latest%; installed %current%", "Get it here: %url%").run();
+                "Update %latest%; installed %current%", "Get it here: %url%",
+                latest -> messages.add(new LogRecord(java.util.logging.Level.INFO, "latest=" + latest))).run();
 
-        assertEquals("Update v1.0.4; installed 1.0.3", messages.get(0).getMessage());
+        assertEquals("latest=v1.0.4", messages.get(0).getMessage());
+        assertEquals("Update v1.0.4; installed 1.0.3", messages.get(1).getMessage());
         assertEquals("Get it here: https://github.com/moonyxk/All-in-one-Plugin/releases/latest",
-                messages.get(1).getMessage());
+                messages.get(2).getMessage());
     }
 
     @Test

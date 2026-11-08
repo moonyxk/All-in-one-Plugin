@@ -25,6 +25,8 @@ import dev.moonyxk.allinoneplugin.listeners.PlayerJoinListener;
 
 public class AllInOnePlugin extends JavaPlugin {
 
+    private volatile String availableUpdateVersion;
+
     @Override
     public void onEnable() {
         // Plugin aktivieren
@@ -66,8 +68,17 @@ public class AllInOnePlugin extends JavaPlugin {
                             getConfig().getString("update-check.available-message",
                                     UpdateChecker.DEFAULT_AVAILABLE_MESSAGE),
                             getConfig().getString("update-check.download-message",
-                                    UpdateChecker.DEFAULT_DOWNLOAD_MESSAGE)));
+                                    UpdateChecker.DEFAULT_DOWNLOAD_MESSAGE),
+                            this::setAvailableUpdateVersion));
         }
+    }
+
+    public String getAvailableUpdateVersion() {
+        return availableUpdateVersion;
+    }
+
+    void setAvailableUpdateVersion(String version) {
+        availableUpdateVersion = version;
     }
 
     private void registerCommand(String name, CommandExecutor executor) {

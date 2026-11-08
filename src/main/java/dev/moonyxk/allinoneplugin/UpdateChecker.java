@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,27 +27,51 @@ public final class UpdateChecker implements Runnable {
     private final URI latestRelease;
     private final String availableMessage;
     private final String downloadMessage;
+    private final Consumer<String> updateAvailable;
 
     public UpdateChecker(String currentVersion, Logger logger) {
         this(currentVersion, logger, URI.create(DEFAULT_LATEST_RELEASE),
-                DEFAULT_AVAILABLE_MESSAGE, DEFAULT_DOWNLOAD_MESSAGE);
+                DEFAULT_AVAILABLE_MESSAGE, DEFAULT_DOWNLOAD_MESSAGE, version -> { });
     }
 
     public UpdateChecker(String currentVersion, Logger logger, String availableMessage, String downloadMessage) {
-        this(currentVersion, logger, URI.create(DEFAULT_LATEST_RELEASE), availableMessage, downloadMessage);
+        this(currentVersion, logger, URI.create(DEFAULT_LATEST_RELEASE),
+                availableMessage, downloadMessage, version -> { });
+    }
+
+    public UpdateChecker(
+            String currentVersion,
+            Logger logger,
+            String availableMessage,
+            String downloadMessage,
+            Consumer<String> updateAvailable) {
+        this(currentVersion, logger, URI.create(DEFAULT_LATEST_RELEASE),
+                availableMessage, downloadMessage, updateAvailable);
     }
 
     UpdateChecker(String currentVersion, Logger logger, URI latestRelease) {
-        this(currentVersion, logger, latestRelease, DEFAULT_AVAILABLE_MESSAGE, DEFAULT_DOWNLOAD_MESSAGE);
+        this(currentVersion, logger, latestRelease,
+                DEFAULT_AVAILABLE_MESSAGE, DEFAULT_DOWNLOAD_MESSAGE, version -> { });
     }
 
     UpdateChecker(
             String currentVersion, Logger logger, URI latestRelease, String availableMessage, String downloadMessage) {
+        this(currentVersion, logger, latestRelease, availableMessage, downloadMessage, version -> { });
+    }
+
+    UpdateChecker(
+            String currentVersion,
+            Logger logger,
+            URI latestRelease,
+            String availableMessage,
+            String downloadMessage,
+            Consumer<String> updateAvailable) {
         this.currentVersion = currentVersion;
         this.logger = logger;
         this.latestRelease = latestRelease;
         this.availableMessage = availableMessage;
         this.downloadMessage = downloadMessage;
+        this.updateAvailable = updateAvailable;
     }
 
     @Override
@@ -71,6 +96,7 @@ public final class UpdateChecker implements Runnable {
             }
             String latestVersion = location.substring((RELEASES_URL + "tag/").length());
             if (isNewerVersion(latestVersion, currentVersion)) {
+                updateAvailable.accept(latestVersion);
                 logger.info(format(availableMessage, latestVersion));
                 logger.info(format(downloadMessage, latestVersion));
             }

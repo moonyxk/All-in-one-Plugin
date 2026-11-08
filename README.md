@@ -45,7 +45,8 @@ für den Namen der umgeschalteten Funktion.
 
 Die Update-Prüfung lässt sich mit `update-check.enabled: false` deaktivieren. Die Hinweise bei
 verfügbaren Updates sind ebenfalls konfigurierbar; `%latest%`, `%current%` und `%url%` werden
-durch die verfügbare, installierte Version und den Release-Link ersetzt.
+durch die verfügbare, installierte Version und den Release-Link ersetzt. Operatoren erhalten
+den konfigurierbaren Hinweis außerdem bei jedem Betreten des Servers.
 
 ## Voraussetzungen
 

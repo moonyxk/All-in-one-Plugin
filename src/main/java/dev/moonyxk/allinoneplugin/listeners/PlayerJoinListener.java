@@ -1,6 +1,7 @@
 package dev.moonyxk.allinoneplugin.listeners;
 
 import dev.moonyxk.allinoneplugin.AllInOnePlugin;
+import dev.moonyxk.allinoneplugin.UpdateChecker;
 import dev.moonyxk.allinoneplugin.features.Feature;
 import dev.moonyxk.allinoneplugin.features.FeatureManager;
 import dev.moonyxk.allinoneplugin.messages.ConfiguredMessages;
@@ -43,7 +44,22 @@ public class PlayerJoinListener implements Listener {
                     Map.of("player", player.getName())));
         }
 
-        Bukkit.broadcast(ConfiguredMessages.component(plugin, "join-broadcast-message",
-                "&6%player% hat den Server betreten!", Map.of("player", player.getName())));
+        String broadcastMessage = plugin.getConfig().getString(
+                "join-broadcast-message", "&6%player% hat den Server betreten!");
+        event.joinMessage(broadcastMessage == null || broadcastMessage.isEmpty()
+                ? null
+                : ConfiguredMessages.component(plugin, "join-broadcast-message",
+                        "&6%player% hat den Server betreten!", Map.of("player", player.getName())));
+
+        String latestVersion = plugin.getAvailableUpdateVersion();
+        if (player.isOp() && latestVersion != null) {
+            player.sendMessage(ConfiguredMessages.component(plugin,
+                    "update-check.operator-join-message",
+                    "&eEs gibt eine neue Version: %latest% (installiert: %current%). Download: %url%",
+                    Map.of(
+                            "latest", latestVersion,
+                            "current", plugin.getPluginMeta().getVersion(),
+                            "url", UpdateChecker.DEFAULT_LATEST_RELEASE)));
+        }
     }
 }

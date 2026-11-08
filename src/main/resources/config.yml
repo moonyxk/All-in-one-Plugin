@@ -22,6 +22,7 @@ update-check:
   enabled: true
   available-message: "Eine neuere Version ist verfügbar: %latest% (installiert: %current%)."
   download-message: "Downloade hier die neuste: %url%"
+  operator-join-message: "&eEs gibt eine neue Version: &f%latest% &7(installiert: %current%). Download: %url%"
 
 # Umschaltbare Funktionen (auch im Spiel über /sigma änderbar).
 features:
