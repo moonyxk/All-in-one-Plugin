@@ -2,6 +2,26 @@
 
 # Join-Nachricht. %player% wird durch den Spielernamen ersetzt.
 join-message: "&aWillkommen, %player%!"
+join-broadcast-message: "&6%player% hat den Server betreten!"
+
+# Statusmeldungen unterstützen &-Farbcodes sowie %feature%.
+messages:
+  feature-enabled: "&7%feature% ist jetzt &aaktiviert&7."
+  feature-disabled: "&7%feature% ist jetzt &cdeaktiviert&7."
+  creeper-damage-enabled: "&7Creeper-Schaden ist jetzt &aaktiviert&7."
+  creeper-damage-disabled: "&7Creeper-Schaden ist jetzt &cdeaktiviert&7."
+  personal-chest-punch-enabled: "&7ChestPunch ist für dich jetzt &aan&7."
+  personal-chest-punch-disabled: "&7ChestPunch ist für dich jetzt &caus&7."
+  personal-sound-enabled: "&7Der ChestPunch-Sound ist für dich jetzt &aan&7."
+  personal-sound-disabled: "&7Der ChestPunch-Sound ist für dich jetzt &caus&7."
+  chest-punch-command-enabled: "&7ChestPunch wurde für dich &aaktiviert&7."
+  chest-punch-command-disabled: "&7ChestPunch wurde für dich &cdeaktiviert&7."
+  chest-punch-server-disabled: "&cChestPunch ist auf diesem Server deaktiviert."
+
+update-check:
+  enabled: true
+  available-message: "Eine neuere Version ist verfügbar: %latest% (installiert: %current%)."
+  download-message: "Downloade hier die neuste: %url%"
 
 # Umschaltbare Funktionen (auch im Spiel über /sigma änderbar).
 features:

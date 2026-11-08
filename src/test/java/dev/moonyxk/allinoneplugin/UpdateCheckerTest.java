@@ -79,6 +79,18 @@ class UpdateCheckerTest {
     }
 
     @Test
+    void usesConfiguredMessagesForNewRelease() {
+        respond(302, "https://github.com/moonyxk/All-in-one-Plugin/releases/tag/v1.0.4");
+        URI uri = URI.create("http://127.0.0.1:" + server.getAddress().getPort() + "/latest");
+        new UpdateChecker("1.0.3", logger, uri,
+                "Update %latest%; installed %current%", "Get it here: %url%").run();
+
+        assertEquals("Update v1.0.4; installed 1.0.3", messages.get(0).getMessage());
+        assertEquals("Get it here: https://github.com/moonyxk/All-in-one-Plugin/releases/latest",
+                messages.get(1).getMessage());
+    }
+
+    @Test
     void doesNotAnnounceAnOlderRelease() {
         respond(302, "https://github.com/moonyxk/All-in-one-Plugin/releases/tag/v1.0.2");
         check();

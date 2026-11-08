@@ -32,10 +32,20 @@ Zusätzliche Funktionen:
 - Beim Schreiben im Chat wird die eigene Nachricht erneut angezeigt und zusammen mit dem Spielernamen in der Konsole ausgegeben.
 - Beim Betreten wird zusätzlich eine Meldung an alle Spieler gesendet.
 - Bei jedem Serverstart prüft das Plugin asynchron das neueste stabile GitHub-Release.
-  Ist es neuer als die installierte Version, meldet die Konsole:
-  `Downloade hier die neuste: https://github.com/moonyxk/All-in-one-Plugin/releases/latest`.
+  Ist es neuer als die installierte Version, meldet die Konsole die konfigurierten Update-Hinweise.
   Der Serverstart wird nicht blockiert; Netzwerkfehler werden als Warnung protokolliert.
   Updates werden nicht automatisch heruntergeladen oder installiert.
+
+## Konfiguration
+
+In der `config.yml` lassen sich die persönliche Begrüßung (`join-message`), die Beitrittsmeldung
+für alle Spieler (`join-broadcast-message`) und die Statusmeldungen unter `messages` anpassen.
+Meldungen unterstützen `&`-Farbcodes; `%player%` steht für den Spielernamen und `%feature%`
+für den Namen der umgeschalteten Funktion.
+
+Die Update-Prüfung lässt sich mit `update-check.enabled: false` deaktivieren. Die Hinweise bei
+verfügbaren Updates sind ebenfalls konfigurierbar; `%latest%`, `%current%` und `%url%` werden
+durch die verfügbare, installierte Version und den Release-Link ersetzt.
 
 ## Voraussetzungen
 

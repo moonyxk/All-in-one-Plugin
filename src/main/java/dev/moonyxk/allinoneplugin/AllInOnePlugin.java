@@ -43,23 +43,31 @@ public class AllInOnePlugin extends JavaPlugin {
         // Umschaltbare Funktionen
         FeatureManager features = new FeatureManager(this);
         ChestPunchListener chestPunchListener = new ChestPunchListener(this, features);
-        registerCommand("sigma", new SigmaCommand(features, chestPunchListener));
+        registerCommand("sigma", new SigmaCommand(this, features, chestPunchListener));
         registerCommand("menu", new MenuCommand(chestPunchListener));
-        registerCommand("chestpunch", new ChestPunchCommand(features, chestPunchListener));
+        registerCommand("chestpunch", new ChestPunchCommand(this, features, chestPunchListener));
 
         // Event-Listener registrieren
         Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(this, features), this);
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerChatListener(this), this);
         Bukkit.getPluginManager().registerEvents(boomDamageListener, this);
-        Bukkit.getPluginManager().registerEvents(new SigmaMenuListener(features), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerMenuListener(chestPunchListener), this);
+        Bukkit.getPluginManager().registerEvents(new SigmaMenuListener(this, features), this);
+        Bukkit.getPluginManager().registerEvents(new PlayerMenuListener(this, chestPunchListener), this);
         Bukkit.getPluginManager().registerEvents(chestPunchListener, this);
         Bukkit.getPluginManager().registerEvents(new CreeperExplosionListener(features), this);
         Bukkit.getPluginManager().registerEvents(new EndermanGriefListener(features), this);
 
-        Bukkit.getScheduler().runTaskAsynchronously(this,
-                new UpdateChecker(getPluginMeta().getVersion(), getLogger()));
+        if (getConfig().getBoolean("update-check.enabled", true)) {
+            Bukkit.getScheduler().runTaskAsynchronously(this,
+                    new UpdateChecker(
+                            getPluginMeta().getVersion(),
+                            getLogger(),
+                            getConfig().getString("update-check.available-message",
+                                    UpdateChecker.DEFAULT_AVAILABLE_MESSAGE),
+                            getConfig().getString("update-check.download-message",
+                                    UpdateChecker.DEFAULT_DOWNLOAD_MESSAGE)));
+        }
     }
 
     private void registerCommand(String name, CommandExecutor executor) {

@@ -27,6 +27,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -72,6 +73,34 @@ class AllInOnePluginTest {
         for (String name : new String[] {"test", "balance", "pay", "shop"}) {
             assertNull(plugin.getCommand(name), "Command should be removed: " + name);
         }
+    }
+
+    @Test
+    void joinMessagesCanBeCustomized() {
+        PlayerMock player = server.addPlayer("Visitor");
+        clearMessages(player);
+        plugin.getConfig().set("join-message", "&bWelcome, %player%!");
+        plugin.getConfig().set("join-broadcast-message", "&d%player% joined!");
+
+        server.getPluginManager().callEvent(new PlayerJoinEvent(player, Component.empty()));
+
+        assertEquals(Component.text("Welcome, Visitor!", NamedTextColor.AQUA),
+                player.nextComponentMessage());
+        assertEquals(Component.text("Visitor joined!", NamedTextColor.LIGHT_PURPLE),
+                player.nextComponentMessage());
+    }
+
+    @Test
+    void featureStatusMessageCanBeCustomized() {
+        PlayerMock admin = server.addPlayer("Admin");
+        admin.setOp(true);
+        clearMessages(admin);
+        plugin.getConfig().set("messages.feature-enabled", "&d%feature% is on!");
+
+        assertTrue(admin.performCommand("allinoneplugin:sigma chest-punch on"));
+
+        assertEquals(Component.text("ChestPunch is on!", NamedTextColor.LIGHT_PURPLE),
+                admin.nextComponentMessage());
     }
 
     @Test

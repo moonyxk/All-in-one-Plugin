@@ -14,22 +14,39 @@ import java.util.regex.Pattern;
 public final class UpdateChecker implements Runnable {
 
     private static final String RELEASES_URL = "https://github.com/moonyxk/All-in-one-Plugin/releases/";
-    private static final String DOWNLOAD_URL = RELEASES_URL + "latest";
+    public static final String DEFAULT_LATEST_RELEASE = RELEASES_URL + "latest";
+    public static final String DEFAULT_AVAILABLE_MESSAGE =
+            "Eine neuere Version ist verfügbar: %latest% (installiert: %current%).";
+    public static final String DEFAULT_DOWNLOAD_MESSAGE = "Downloade hier die neuste: %url%";
     private static final Pattern VERSION = Pattern.compile(
             "^v?(\\d+)\\.(\\d+)\\.(\\d+)(?:-([0-9A-Za-z.-]+))?(?:\\+[0-9A-Za-z.-]+)?$");
 
     private final String currentVersion;
     private final Logger logger;
     private final URI latestRelease;
+    private final String availableMessage;
+    private final String downloadMessage;
 
     public UpdateChecker(String currentVersion, Logger logger) {
-        this(currentVersion, logger, URI.create(DOWNLOAD_URL));
+        this(currentVersion, logger, URI.create(DEFAULT_LATEST_RELEASE),
+                DEFAULT_AVAILABLE_MESSAGE, DEFAULT_DOWNLOAD_MESSAGE);
+    }
+
+    public UpdateChecker(String currentVersion, Logger logger, String availableMessage, String downloadMessage) {
+        this(currentVersion, logger, URI.create(DEFAULT_LATEST_RELEASE), availableMessage, downloadMessage);
     }
 
     UpdateChecker(String currentVersion, Logger logger, URI latestRelease) {
+        this(currentVersion, logger, latestRelease, DEFAULT_AVAILABLE_MESSAGE, DEFAULT_DOWNLOAD_MESSAGE);
+    }
+
+    UpdateChecker(
+            String currentVersion, Logger logger, URI latestRelease, String availableMessage, String downloadMessage) {
         this.currentVersion = currentVersion;
         this.logger = logger;
         this.latestRelease = latestRelease;
+        this.availableMessage = availableMessage;
+        this.downloadMessage = downloadMessage;
     }
 
     @Override
@@ -54,9 +71,8 @@ public final class UpdateChecker implements Runnable {
             }
             String latestVersion = location.substring((RELEASES_URL + "tag/").length());
             if (isNewerVersion(latestVersion, currentVersion)) {
-                logger.info("Eine neuere Version ist verfügbar: " + latestVersion
-                        + " (installiert: " + currentVersion + ").");
-                logger.info("Downloade hier die neuste: " + DOWNLOAD_URL);
+                logger.info(format(availableMessage, latestVersion));
+                logger.info(format(downloadMessage, latestVersion));
             }
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
@@ -64,6 +80,12 @@ public final class UpdateChecker implements Runnable {
         } catch (IOException | IllegalArgumentException exception) {
             logger.warning("GitHub-Versionsprüfung fehlgeschlagen: " + exception.getMessage());
         }
+    }
+
+    private String format(String template, String latestVersion) {
+        return template.replace("%latest%", latestVersion)
+                .replace("%current%", currentVersion)
+                .replace("%url%", DEFAULT_LATEST_RELEASE);
     }
 
     static boolean isNewerVersion(String latestVersion, String currentVersion) {

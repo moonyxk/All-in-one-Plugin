@@ -5,6 +5,8 @@ import dev.moonyxk.allinoneplugin.features.FeatureManager;
 import dev.moonyxk.allinoneplugin.features.PlayerMenu;
 import dev.moonyxk.allinoneplugin.features.SigmaMenu;
 import dev.moonyxk.allinoneplugin.listeners.ChestPunchListener;
+import dev.moonyxk.allinoneplugin.messages.ConfiguredMessages;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -14,15 +16,18 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class SigmaCommand implements TabExecutor {
 
     public static final String PERMISSION = "allinoneplugin.sigma";
 
+    private final JavaPlugin plugin;
     private final FeatureManager features;
     private final ChestPunchListener chestPunch;
 
-    public SigmaCommand(FeatureManager features, ChestPunchListener chestPunch) {
+    public SigmaCommand(JavaPlugin plugin, FeatureManager features, ChestPunchListener chestPunch) {
+        this.plugin = plugin;
         this.features = features;
         this.chestPunch = chestPunch;
     }
@@ -64,7 +69,7 @@ public class SigmaCommand implements TabExecutor {
         }
         for (Feature feature : Feature.values()) {
             if (feature.commandToggleable()) {
-                sender.sendMessage(stateMessage(feature, features.isEnabled(feature)));
+                sender.sendMessage(stateMessage(plugin, feature, features.isEnabled(feature)));
             }
         }
     }
@@ -78,7 +83,7 @@ public class SigmaCommand implements TabExecutor {
 
         if (args.length == 1) {
             boolean enabled = features.toggle(feature);
-            sender.sendMessage(stateMessage(feature, enabled));
+            sender.sendMessage(stateMessage(plugin, feature, enabled));
             return true;
         }
 
@@ -87,7 +92,7 @@ public class SigmaCommand implements TabExecutor {
             return false;
         }
         features.setEnabled(feature, enabled);
-        sender.sendMessage(stateMessage(feature, enabled));
+        sender.sendMessage(stateMessage(plugin, feature, enabled));
         return true;
     }
 
@@ -120,11 +125,12 @@ public class SigmaCommand implements TabExecutor {
         return options;
     }
 
-    public static Component stateMessage(Feature feature, boolean enabled) {
-        return Component.text(feature.displayName() + " ist jetzt ", NamedTextColor.GRAY)
-                .append(enabled
-                        ? Component.text("aktiviert", NamedTextColor.GREEN)
-                        : Component.text("deaktiviert", NamedTextColor.RED))
-                .append(Component.text(".", NamedTextColor.GRAY));
+    public static Component stateMessage(JavaPlugin plugin, Feature feature, boolean enabled) {
+        String key = enabled ? "feature-enabled" : "feature-disabled";
+        String fallback = enabled
+                ? "&7%feature% ist jetzt &aaktiviert&7."
+                : "&7%feature% ist jetzt &cdeaktiviert&7.";
+        return ConfiguredMessages.component(plugin, "messages." + key, fallback,
+                Map.of("feature", feature.displayName()));
     }
 }

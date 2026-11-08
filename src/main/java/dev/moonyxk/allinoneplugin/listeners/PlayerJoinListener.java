@@ -3,8 +3,8 @@ package dev.moonyxk.allinoneplugin.listeners;
 import dev.moonyxk.allinoneplugin.AllInOnePlugin;
 import dev.moonyxk.allinoneplugin.features.Feature;
 import dev.moonyxk.allinoneplugin.features.FeatureManager;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import dev.moonyxk.allinoneplugin.messages.ConfiguredMessages;
+import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,12 +35,15 @@ public class PlayerJoinListener implements Listener {
 
         String customMessage = plugin.getConfig().getString("join-message");
         if (customMessage != null && !customMessage.isEmpty()) {
-            player.sendMessage(customMessage.replace("%player%", player.getName()));
+            player.sendMessage(ConfiguredMessages.component(
+                    plugin, "join-message", "&aWillkommen, %player%!", Map.of("player", player.getName())));
         } else {
-            player.sendMessage("§eWillkommen auf dem Server, " + player.getName() + "!");
+            player.sendMessage(ConfiguredMessages.component(
+                    plugin, "join-message", "&eWillkommen auf dem Server, %player%!",
+                    Map.of("player", player.getName())));
         }
 
-        // Nachricht für alle Spieler (Broadcast)
-        Bukkit.broadcast(Component.text(player.getName() + " hat den Server betreten!", NamedTextColor.GOLD));
+        Bukkit.broadcast(ConfiguredMessages.component(plugin, "join-broadcast-message",
+                "&6%player% hat den Server betreten!", Map.of("player", player.getName())));
     }
 }

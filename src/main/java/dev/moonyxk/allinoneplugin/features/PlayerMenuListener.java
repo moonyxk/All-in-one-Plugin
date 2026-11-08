@@ -1,19 +1,22 @@
 package dev.moonyxk.allinoneplugin.features;
 
 import dev.moonyxk.allinoneplugin.listeners.ChestPunchListener;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import dev.moonyxk.allinoneplugin.messages.ConfiguredMessages;
+import java.util.Map;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class PlayerMenuListener implements Listener {
 
+    private final JavaPlugin plugin;
     private final ChestPunchListener chestPunch;
 
-    public PlayerMenuListener(ChestPunchListener chestPunch) {
+    public PlayerMenuListener(JavaPlugin plugin, ChestPunchListener chestPunch) {
+        this.plugin = plugin;
         this.chestPunch = chestPunch;
     }
 
@@ -32,17 +35,21 @@ public class PlayerMenuListener implements Listener {
         if (event.getSlot() == PlayerMenu.CHEST_PUNCH_SLOT) {
             boolean enabled = chestPunch.toggleFor(player);
             menu.render(enabled, chestPunch.isSoundEnabledFor(player));
-            player.sendMessage(Component.text("ChestPunch ist für dich jetzt ", NamedTextColor.GRAY)
-                    .append(Component.text(enabled ? "an" : "aus",
-                            enabled ? NamedTextColor.GREEN : NamedTextColor.RED))
-                    .append(Component.text(".", NamedTextColor.GRAY)));
+            String key = enabled ? "personal-chest-punch-enabled" : "personal-chest-punch-disabled";
+            String fallback = enabled
+                    ? "&7ChestPunch ist für dich jetzt &aan&7."
+                    : "&7ChestPunch ist für dich jetzt &caus&7.";
+            player.sendMessage(ConfiguredMessages.component(
+                    plugin, "messages." + key, fallback, Map.of()));
         } else if (event.getSlot() == PlayerMenu.SOUND_SLOT) {
             boolean enabled = chestPunch.toggleSoundFor(player);
             menu.render(chestPunch.isEnabledFor(player), enabled);
-            player.sendMessage(Component.text("Der ChestPunch-Sound ist für dich jetzt ", NamedTextColor.GRAY)
-                    .append(Component.text(enabled ? "an" : "aus",
-                            enabled ? NamedTextColor.GREEN : NamedTextColor.RED))
-                    .append(Component.text(".", NamedTextColor.GRAY)));
+            String key = enabled ? "personal-sound-enabled" : "personal-sound-disabled";
+            String fallback = enabled
+                    ? "&7Der ChestPunch-Sound ist für dich jetzt &aan&7."
+                    : "&7Der ChestPunch-Sound ist für dich jetzt &caus&7.";
+            player.sendMessage(ConfiguredMessages.component(
+                    plugin, "messages." + key, fallback, Map.of()));
         }
     }
 
