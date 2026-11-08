@@ -13,7 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public final class SigmaMenu implements InventoryHolder {
 
-    public static final Component TITLE = Component.text("Sigma-Menü", NamedTextColor.DARK_PURPLE);
+    public static final Component TITLE = Component.text("Servermenü", NamedTextColor.DARK_PURPLE);
 
     private final FeatureManager features;
     private final Inventory inventory;

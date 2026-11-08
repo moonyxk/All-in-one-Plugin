@@ -26,7 +26,7 @@ commands:
     usage: /boom <Spieler> [true|false]
     permission: allinoneplugin.mod
   sigma:
-    description: Öffnet das Menü zum Aktivieren und Deaktivieren von Funktionen.
+    description: Öffnet für berechtigte Spieler das Servermenü, sonst das persönliche Menü.
     usage: /sigma [Funktion] [on|off]
   menu:
     description: Öffnet dein persönliches Einstellungsmenü.

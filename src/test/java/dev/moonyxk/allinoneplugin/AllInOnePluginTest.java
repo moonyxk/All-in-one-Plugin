@@ -232,6 +232,16 @@ class AllInOnePluginTest {
     }
 
     @Test
+    void sigmaMenuUsesServerTitle() {
+        PlayerMock admin = server.addPlayer("Admin");
+        admin.setOp(true);
+
+        assertTrue(admin.performCommand("allinoneplugin:sigma"));
+        assertEquals(Component.text("Servermenü", NamedTextColor.DARK_PURPLE),
+                admin.getOpenInventory().title());
+    }
+
+    @Test
     void sigmaMenuTogglesFeatures() {
         PlayerMock admin = server.addPlayer("Admin");
         admin.setOp(true);
