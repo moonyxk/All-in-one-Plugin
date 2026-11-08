@@ -67,7 +67,7 @@ class AllInOnePluginTest {
     @Test
     void enablesAndRegistersCommands() {
         assertTrue(plugin.isEnabled());
-        for (String name : new String[] {"heal", "feed", "fly", "kick", "boom", "sigma", "menu", "chestpunch"}) {
+        for (String name : new String[] {"heal", "feed", "fly", "kick", "boom", "jumpscare", "sigma", "menu", "chestpunch"}) {
             assertNotNull(plugin.getCommand(name), "Command not registered: " + name);
         }
         for (String name : new String[] {"test", "balance", "pay", "shop"}) {
@@ -193,9 +193,8 @@ class AllInOnePluginTest {
         clearMessages(moderator);
         clearMessages(target);
 
-        assertTrue(moderator.performCommand("allinoneplugin:boom Target maybe"));
-        assertEquals(Component.text("Bitte gib für damage true oder false an.", NamedTextColor.RED),
-                moderator.nextComponentMessage());
+        assertFalse(moderator.performCommand("allinoneplugin:boom Target maybe"));
+        assertEquals(Component.text("/boom <Spieler>"), moderator.nextComponentMessage());
         assertTrue(explosions.isEmpty());
 
         assertTrue(moderator.performCommand("allinoneplugin:boom Target"));
@@ -204,13 +203,12 @@ class AllInOnePluginTest {
 
         clearMessages(moderator);
         clearMessages(target);
-        assertTrue(moderator.performCommand("allinoneplugin:boom Target false"));
+        assertTrue(moderator.performCommand("allinoneplugin:jumpscare Target"));
         assertEquals(2, explosions.size());
 
-        clearMessages(moderator);
-        clearMessages(target);
-        assertTrue(moderator.performCommand("allinoneplugin:boom Target true"));
-        assertEquals(3, explosions.size());
+        assertEquals(Component.text("BOOM!", NamedTextColor.RED), target.nextComponentMessage());
+        assertEquals(Component.text("Jumpscare bei Target ausgelöst.", NamedTextColor.GREEN),
+                moderator.nextComponentMessage());
 
         clearMessages(moderator);
         clearMessages(target);
@@ -233,11 +231,9 @@ class AllInOnePluginTest {
         assertFalse(moderator.performCommand("allinoneplugin:kick Target"));
         assertEquals(Component.text("/kick <Spieler> <Grund>"), moderator.nextComponentMessage());
 
-        for (String name : new String[] {"heal", "feed", "fly", "boom"}) {
+        for (String name : new String[] {"heal", "feed", "fly", "boom", "jumpscare"}) {
             assertFalse(moderator.performCommand("allinoneplugin:" + name));
-            String usage = name.equals("boom")
-                    ? "/boom <Spieler> [true|false]"
-                    : "/" + name + " <Spieler>";
+            String usage = "/" + name + " <Spieler>";
             assertEquals(Component.text(usage),
                     moderator.nextComponentMessage());
             assertTrue(moderator.performCommand("allinoneplugin:" + name + " Offline"));
@@ -268,12 +264,12 @@ class AllInOnePluginTest {
         target.setHealth(10);
         target.setFoodLevel(5);
 
-        for (String name : new String[] {"heal", "feed", "fly", "kick", "boom"}) {
+        for (String name : new String[] {"heal", "feed", "fly", "kick", "boom", "jumpscare"}) {
             assertEquals("allinoneplugin.mod", plugin.getCommand(name).getPermission());
         }
         assertEquals(PermissionDefault.OP, server.getPluginManager().getPermission("allinoneplugin.mod").getDefault());
 
-        for (String command : new String[] {"heal Target", "feed Target", "fly Target", "kick Target Test", "boom Target"}) {
+        for (String command : new String[] {"heal Target", "feed Target", "fly Target", "kick Target Test", "boom Target", "jumpscare Target"}) {
             assertTrue(sender.performCommand("allinoneplugin:" + command));
         }
         assertEquals(10, target.getHealth());

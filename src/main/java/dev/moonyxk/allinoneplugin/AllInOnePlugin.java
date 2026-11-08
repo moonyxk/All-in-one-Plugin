@@ -9,6 +9,7 @@ import dev.moonyxk.allinoneplugin.commands.ChestPunchCommand;
 import dev.moonyxk.allinoneplugin.commands.FeedCommand;
 import dev.moonyxk.allinoneplugin.commands.FlyCommand;
 import dev.moonyxk.allinoneplugin.commands.HealCommand;
+import dev.moonyxk.allinoneplugin.commands.JumpscareCommand;
 import dev.moonyxk.allinoneplugin.commands.KickCommand;
 import dev.moonyxk.allinoneplugin.commands.MenuCommand;
 import dev.moonyxk.allinoneplugin.commands.SigmaCommand;
@@ -41,6 +42,7 @@ public class AllInOnePlugin extends JavaPlugin {
         registerCommand("kick", new KickCommand());
         BoomDamageListener boomDamageListener = new BoomDamageListener();
         registerCommand("boom", new BoomCommand(boomDamageListener));
+        registerCommand("jumpscare", new JumpscareCommand(boomDamageListener));
 
         // Umschaltbare Funktionen
         FeatureManager features = new FeatureManager(this);

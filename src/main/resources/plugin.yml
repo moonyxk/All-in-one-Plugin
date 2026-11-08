@@ -22,8 +22,12 @@ commands:
     usage: /kick <Spieler> <Grund>
     permission: allinoneplugin.mod
   boom:
-    description: Erzeugt eine Explosion um einen Spieler, optional ohne Schaden.
-    usage: /boom <Spieler> [true|false]
+    description: Erzeugt eine Explosion bei einem Spieler ohne Blockschaden.
+    usage: /boom <Spieler>
+    permission: allinoneplugin.mod
+  jumpscare:
+    description: Erzeugt eine schadensfreie Explosion bei einem Spieler ohne Blockschaden.
+    usage: /jumpscare <Spieler>
     permission: allinoneplugin.mod
   sigma:
     description: Öffnet für berechtigte Spieler das Servermenü, sonst das persönliche Menü.
