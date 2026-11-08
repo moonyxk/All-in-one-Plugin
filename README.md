@@ -31,6 +31,11 @@ Zusätzliche Funktionen:
 - Eine Nachricht im Chat und in der Konsole, wenn ein Diamanterzblock abgebaut wird.
 - Beim Schreiben im Chat wird die eigene Nachricht erneut angezeigt und zusammen mit dem Spielernamen in der Konsole ausgegeben.
 - Beim Betreten wird zusätzlich eine Meldung an alle Spieler gesendet.
+- Bei jedem Serverstart prüft das Plugin asynchron das neueste stabile GitHub-Release.
+  Ist es neuer als die installierte Version, meldet die Konsole:
+  `Downloade hier die neuste: https://github.com/moonyxk/All-in-one-Plugin/releases/latest`.
+  Der Serverstart wird nicht blockiert; Netzwerkfehler werden als Warnung protokolliert.
+  Updates werden nicht automatisch heruntergeladen oder installiert.
 
 ## Voraussetzungen
 

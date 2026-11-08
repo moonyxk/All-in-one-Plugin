@@ -57,6 +57,9 @@ public class AllInOnePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(chestPunchListener, this);
         Bukkit.getPluginManager().registerEvents(new CreeperExplosionListener(features), this);
         Bukkit.getPluginManager().registerEvents(new EndermanGriefListener(features), this);
+
+        Bukkit.getScheduler().runTaskAsynchronously(this,
+                new UpdateChecker(getPluginMeta().getVersion(), getLogger()));
     }
 
     private void registerCommand(String name, CommandExecutor executor) {
