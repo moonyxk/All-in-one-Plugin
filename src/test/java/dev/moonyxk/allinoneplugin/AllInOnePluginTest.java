@@ -99,22 +99,22 @@ class AllInOnePluginTest {
         PlayerMock admin = server.addPlayer("Admin");
         admin.setOp(true);
         clearMessages(admin);
+        Component expectedUpdateMessage = Component.text(
+                "Update 1.0.5, current " + plugin.getPluginMeta().getVersion()
+                        + ", https://github.com/moonyxk/All-in-one-Plugin/releases/latest",
+                NamedTextColor.YELLOW);
 
         PlayerJoinEvent event = new PlayerJoinEvent(admin, Component.empty());
         server.getPluginManager().callEvent(event);
         assertEquals(Component.text("Willkommen, Admin!", NamedTextColor.GREEN),
                 admin.nextComponentMessage());
-        assertEquals(Component.text(
-                "Update 1.0.5, current 1.0.4, https://github.com/moonyxk/All-in-one-Plugin/releases/latest",
-                NamedTextColor.YELLOW), admin.nextComponentMessage());
+        assertEquals(expectedUpdateMessage, admin.nextComponentMessage());
 
         clearMessages(admin);
         server.getPluginManager().callEvent(new PlayerJoinEvent(admin, Component.empty()));
         assertEquals(Component.text("Willkommen, Admin!", NamedTextColor.GREEN),
                 admin.nextComponentMessage());
-        assertEquals(Component.text(
-                "Update 1.0.5, current 1.0.4, https://github.com/moonyxk/All-in-one-Plugin/releases/latest",
-                NamedTextColor.YELLOW), admin.nextComponentMessage());
+        assertEquals(expectedUpdateMessage, admin.nextComponentMessage());
 
         PlayerMock player = server.addPlayer("Player");
         clearMessages(player);
