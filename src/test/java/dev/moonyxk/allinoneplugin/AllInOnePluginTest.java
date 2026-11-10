@@ -11,6 +11,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.ExplosionResult;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Block;
@@ -32,6 +33,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.persistence.PersistentDataType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -444,6 +446,44 @@ class AllInOnePluginTest {
     }
 
     @Test
+    void personalMenuTogglesTpsDisplayAndCyclesItsModes() {
+        PlayerMock player = server.addPlayer("Player");
+        NamespacedKey enabledKey = new NamespacedKey(plugin, "tabtps-enabled");
+        NamespacedKey modeKey = new NamespacedKey(plugin, "tabtps-mode");
+
+        assertTrue(player.performCommand("allinoneplugin:menu"));
+        InventoryView view = player.getOpenInventory();
+        assertEquals(Material.GRAY_DYE,
+                view.getTopInventory().getItem(PlayerMenu.TPS_DISPLAY_SLOT).getType());
+
+        InventoryClickEvent click = clickInventorySlot(view, PlayerMenu.TPS_DISPLAY_SLOT, ClickType.LEFT);
+        assertTrue(click.isCancelled());
+        assertTrue(player.getPersistentDataContainer().getOrDefault(
+                enabledKey, PersistentDataType.BOOLEAN, false));
+        assertEquals(Material.CLOCK,
+                view.getTopInventory().getItem(PlayerMenu.TPS_DISPLAY_SLOT).getType());
+
+        click = clickInventorySlot(view, PlayerMenu.TPS_DISPLAY_SLOT, ClickType.RIGHT);
+        assertTrue(click.isCancelled());
+        assertEquals("ACTION_BAR",
+                player.getPersistentDataContainer().get(modeKey, PersistentDataType.STRING));
+        assertTrue(player.getPersistentDataContainer().getOrDefault(
+                enabledKey, PersistentDataType.BOOLEAN, false));
+
+        click = clickInventorySlot(view, PlayerMenu.TPS_DISPLAY_SLOT, ClickType.RIGHT);
+        assertTrue(click.isCancelled());
+        assertEquals("BOSS_BAR",
+                player.getPersistentDataContainer().get(modeKey, PersistentDataType.STRING));
+
+        click = clickInventorySlot(view, PlayerMenu.TPS_DISPLAY_SLOT, ClickType.LEFT);
+        assertTrue(click.isCancelled());
+        assertFalse(player.getPersistentDataContainer().getOrDefault(
+                enabledKey, PersistentDataType.BOOLEAN, true));
+        assertEquals(Material.GRAY_DYE,
+                view.getTopInventory().getItem(PlayerMenu.TPS_DISPLAY_SLOT).getType());
+    }
+
+    @Test
     void noCreeperGriefCanBeToggled() {
         WorldMock world = server.addSimpleWorld("creeper-test");
         Creeper creeper = world.spawn(new Location(world, 0, 70, 0), Creeper.class);
@@ -512,8 +552,12 @@ class AllInOnePluginTest {
     }
 
     private InventoryClickEvent clickInventorySlot(InventoryView view, int slot) {
+        return clickInventorySlot(view, slot, ClickType.LEFT);
+    }
+
+    private InventoryClickEvent clickInventorySlot(InventoryView view, int slot, ClickType clickType) {
         InventoryClickEvent event = new InventoryClickEvent(view, InventoryType.SlotType.CONTAINER,
-                slot, ClickType.LEFT, InventoryAction.PICKUP_ALL);
+                slot, clickType, InventoryAction.PICKUP_ALL);
         server.getPluginManager().callEvent(event);
         return event;
     }

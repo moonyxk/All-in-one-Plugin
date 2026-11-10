@@ -4,6 +4,7 @@ import dev.moonyxk.allinoneplugin.features.Feature;
 import dev.moonyxk.allinoneplugin.features.FeatureManager;
 import dev.moonyxk.allinoneplugin.features.PlayerMenu;
 import dev.moonyxk.allinoneplugin.features.SigmaMenu;
+import dev.moonyxk.allinoneplugin.features.TpsDisplayManager;
 import dev.moonyxk.allinoneplugin.listeners.ChestPunchListener;
 import dev.moonyxk.allinoneplugin.messages.ConfiguredMessages;
 import java.util.Map;
@@ -25,11 +26,17 @@ public class SigmaCommand implements TabExecutor {
     private final JavaPlugin plugin;
     private final FeatureManager features;
     private final ChestPunchListener chestPunch;
+    private final TpsDisplayManager tpsDisplayManager;
 
-    public SigmaCommand(JavaPlugin plugin, FeatureManager features, ChestPunchListener chestPunch) {
+    public SigmaCommand(
+            JavaPlugin plugin,
+            FeatureManager features,
+            ChestPunchListener chestPunch,
+            TpsDisplayManager tpsDisplayManager) {
         this.plugin = plugin;
         this.features = features;
         this.chestPunch = chestPunch;
+        this.tpsDisplayManager = tpsDisplayManager;
     }
 
     @Override
@@ -54,7 +61,8 @@ public class SigmaCommand implements TabExecutor {
         }
         if (args.length == 0) {
             player.openInventory(new PlayerMenu(player.getUniqueId(),
-                    chestPunch.isEnabledFor(player), chestPunch.isSoundEnabledFor(player)).getInventory());
+                    chestPunch.isEnabledFor(player), chestPunch.isSoundEnabledFor(player),
+                    tpsDisplayManager.isEnabledFor(player), tpsDisplayManager.modeFor(player)).getInventory());
         } else {
             player.sendMessage(Component.text("Dafür benötigst du die Berechtigung "
                     + PERMISSION + ".", NamedTextColor.RED));

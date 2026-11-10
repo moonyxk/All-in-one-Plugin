@@ -1,6 +1,7 @@
 package dev.moonyxk.allinoneplugin.commands;
 
 import dev.moonyxk.allinoneplugin.features.PlayerMenu;
+import dev.moonyxk.allinoneplugin.features.TpsDisplayManager;
 import dev.moonyxk.allinoneplugin.listeners.ChestPunchListener;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,9 +13,11 @@ import org.bukkit.entity.Player;
 public class MenuCommand implements CommandExecutor {
 
     private final ChestPunchListener chestPunch;
+    private final TpsDisplayManager tpsDisplayManager;
 
-    public MenuCommand(ChestPunchListener chestPunch) {
+    public MenuCommand(ChestPunchListener chestPunch, TpsDisplayManager tpsDisplayManager) {
         this.chestPunch = chestPunch;
+        this.tpsDisplayManager = tpsDisplayManager;
     }
 
     @Override
@@ -28,7 +31,8 @@ public class MenuCommand implements CommandExecutor {
         }
 
         player.openInventory(new PlayerMenu(player.getUniqueId(),
-                chestPunch.isEnabledFor(player), chestPunch.isSoundEnabledFor(player)).getInventory());
+                chestPunch.isEnabledFor(player), chestPunch.isSoundEnabledFor(player),
+                tpsDisplayManager.isEnabledFor(player), tpsDisplayManager.modeFor(player)).getInventory());
         return true;
     }
 }

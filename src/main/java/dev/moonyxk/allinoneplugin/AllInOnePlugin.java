@@ -16,6 +16,7 @@ import dev.moonyxk.allinoneplugin.commands.SigmaCommand;
 import dev.moonyxk.allinoneplugin.features.FeatureManager;
 import dev.moonyxk.allinoneplugin.features.PlayerMenuListener;
 import dev.moonyxk.allinoneplugin.features.SigmaMenuListener;
+import dev.moonyxk.allinoneplugin.features.TpsDisplayManager;
 import dev.moonyxk.allinoneplugin.listeners.BlockBreakListener;
 import dev.moonyxk.allinoneplugin.listeners.BoomDamageListener;
 import dev.moonyxk.allinoneplugin.listeners.ChestPunchListener;
@@ -27,6 +28,7 @@ import dev.moonyxk.allinoneplugin.listeners.PlayerJoinListener;
 public class AllInOnePlugin extends JavaPlugin {
 
     private volatile String availableUpdateVersion;
+    private TpsDisplayManager tpsDisplayManager;
 
     @Override
     public void onEnable() {
@@ -47,8 +49,9 @@ public class AllInOnePlugin extends JavaPlugin {
         // Umschaltbare Funktionen
         FeatureManager features = new FeatureManager(this);
         ChestPunchListener chestPunchListener = new ChestPunchListener(this, features);
-        registerCommand("sigma", new SigmaCommand(this, features, chestPunchListener));
-        registerCommand("menu", new MenuCommand(chestPunchListener));
+        tpsDisplayManager = new TpsDisplayManager(this);
+        registerCommand("sigma", new SigmaCommand(this, features, chestPunchListener, tpsDisplayManager));
+        registerCommand("menu", new MenuCommand(chestPunchListener, tpsDisplayManager));
         registerCommand("chestpunch", new ChestPunchCommand(this, features, chestPunchListener));
 
         // Event-Listener registrieren
@@ -56,10 +59,13 @@ public class AllInOnePlugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new BlockBreakListener(), this);
         Bukkit.getPluginManager().registerEvents(new PlayerChatListener(this), this);
         Bukkit.getPluginManager().registerEvents(new SigmaMenuListener(this, features), this);
-        Bukkit.getPluginManager().registerEvents(new PlayerMenuListener(this, chestPunchListener), this);
+        Bukkit.getPluginManager().registerEvents(tpsDisplayManager, this);
+        Bukkit.getPluginManager().registerEvents(
+                new PlayerMenuListener(this, chestPunchListener, tpsDisplayManager), this);
         Bukkit.getPluginManager().registerEvents(chestPunchListener, this);
         Bukkit.getPluginManager().registerEvents(new CreeperExplosionListener(features), this);
         Bukkit.getPluginManager().registerEvents(new EndermanGriefListener(features), this);
+        tpsDisplayManager.restoreOnlinePlayers();
 
         if (getConfig().getBoolean("update-check.enabled", true)) {
             Bukkit.getScheduler().runTaskAsynchronously(this,
@@ -92,6 +98,9 @@ public class AllInOnePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (tpsDisplayManager != null) {
+            tpsDisplayManager.shutdown();
+        }
         // Plugin deaktivieren
         getLogger().info("AllInOnePlugin wird deaktiviert...");
     }
